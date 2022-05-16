@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TestsDesc Version="1">
+    <Test Question="Для кого устанавливается сокращенная продолжительность рабочего времени:" InfoFile="1. Трудовое законодательство\1.7 Рабочее время.png">
+		<Answer correct="0">Для лиц, не достигших 18 лет.</Answer>
+		<Answer correct="1">Для лиц, не достигших 18 лет; работников занятых на работах с вредными и опасными условиями труда; для работников, являющихся инвалидами I и II группы.</Answer>
+		<Answer correct="0">Для беременных женщин.</Answer>
+		<Answer correct="0">Для всех выше названных.</Answer>
+	</Test>
+	<Test Question="Когда проводится вводный инструктаж по охране труда в организации:" InfoFile="3. Обучение и инструктирование работников.rtf">
+		<Answer correct="0">При перерыве в работе более 60 дней.</Answer>
+		<Answer correct="1">При оформлении на работу.</Answer>
+		<Answer correct="0">При переводе из одного подразделения организации в другое.</Answer>
+		<Answer correct="0">По требованию инспектора труда.</Answer>
+	</Test>
+	<Test Question="Как оформляется расследование несчастных случаев на производстве:" InfoFile="4. Учет и расследование несч.случ\4.4.Оформление материалов расследования.png">
+		<Answer correct="1">Актом  формы Н-1.</Answer>
+		<Answer correct="0">Актом произвольной формы.</Answer>
+		<Answer correct="0">Протоколами опроса пострадавшего и свидетелей.</Answer>
+	</Test>
+	<Test Question="Какова предельно-допустимая величина уровня производственного шума" InfoFile="">
+		<Answer correct="1">80 дБ(А)</Answer>
+		<Answer correct="0">85 дБ(А)</Answer>
+		<Answer correct="0">70 дБ(А)</Answer>
+		<Answer correct="0">90 дБ(А)</Answer>
+	</Test>
+	<Test Question="Оптимальные нормы подъема и перемещения тяжестей мужчинами при чередовании с другой работой:" InfoFile="14. Нормы подъема тяжестей\14.1 Для женщин и мужчин.png">
+		<Answer correct="1">15 кг</Answer>
+		<Answer correct="0">5 кг</Answer>
+		<Answer correct="0">7 кг</Answer>
+		<Answer correct="0">8 кг</Answer>
+		<Answer correct="0">3 кг</Answer>
+	</Test>
+</TestsDesc>
