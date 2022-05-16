@@ -255,22 +255,22 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(t(
             "Экзамен сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
-            "Правильность ответов: {score:.0f}%"
+            "Правильность ответов: {correctness:.0f}%"
         ).format(
             score=current_score,
             max_score=max_score,
-            correctness=current_score / (max_score / 100)
+            correctness=(current_score / max_score) * 100
         ))
 
     else:
         await callback.message.answer(t(
             "Экзамен не сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
-            "Правильность ответов: {score:.0f}%"
+            "Правильность ответов: {correctness:.0f}%"
         ).format(
             score=current_score,
             max_score=max_score,
-            correctness=current_score / (max_score / 100)
+            correctness=(current_score / max_score) * 100
         ))
 
 
