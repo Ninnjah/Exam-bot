@@ -53,7 +53,7 @@ async def main():
         echo=False,
     )
 
-    bot = Bot(token=config.tg_bot.token)
+    bot = Bot(token=config.tg_bot.token, parse_mode="html")
     dp = Dispatcher(bot, storage=storage)
     dp.middleware.setup(i18n)
     dp.middleware.setup(DbMiddleware(pool))
