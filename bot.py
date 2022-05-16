@@ -3,7 +3,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.contrib.fsm_storage.redis import RedisStorage
+from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
@@ -42,7 +42,7 @@ async def main():
     config = load_config("bot.ini")
 
     if config.tg_bot.use_redis:
-        storage = RedisStorage()
+        storage = RedisStorage2()
     else:
         storage = MemoryStorage()
     pool = await create_pool(
