@@ -13,7 +13,7 @@ from tgbot.middlewares.locale import i18n as t
 ASSETS_PATH = Path("assets")
 
 
-async def select_ticket(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
+async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
     await state.reset_state()
     # Test category (directory name)
     category: str = callback_data.get("category")
@@ -49,7 +49,7 @@ async def ticket_show(callback: CallbackQuery, callback_data: Dict[str, str], st
 
 def register_exam(dp: Dispatcher):
     dp.register_callback_query_handler(
-        select_ticket, cat_select_cb.filter(), state="*"
+        ticket_select, cat_select_cb.filter(), state="*"
     )
     dp.register_callback_query_handler(
         ticket_show, show_ticket_cb.filter(), state="*"
