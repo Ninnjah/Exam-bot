@@ -1,4 +1,4 @@
 from aiogram.utils.callback_data import CallbackData
 
-exam_start = CallbackData("start_exam", "type")
-menu_explorer = CallbackData("menu_explorer", "menu")
+exam_start_cb = CallbackData("start_exam", "type")
+menu_explorer_cb = CallbackData("menu_explorer", "menu")
