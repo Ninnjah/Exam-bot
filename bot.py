@@ -14,6 +14,7 @@ from tgbot.database.tables import metadata
 from tgbot.filters.role import RoleFilter, AdminFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.user import register_user
+from tgbot.handlers.exam import register_exam
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
 from tgbot.middlewares.locale import i18n
@@ -63,6 +64,7 @@ async def main():
 
     register_admin(dp)
     register_user(dp)
+    register_exam(dp)
 
     # start
     try:
