@@ -5,10 +5,12 @@ from typing import Dict
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
+from aiogram.utils.exceptions import MessageCantBeDeleted, MessageToDeleteNotFound
 
-from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb
+from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb, ticket_cancel_cb
 from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb
 from tgbot.middlewares.locale import i18n as t
+from tgbot.services.repository import Repo
 
 ASSETS_PATH = Path("assets")
 
@@ -47,10 +49,33 @@ async def ticket_show(callback: CallbackQuery, callback_data: Dict[str, str], st
     )
 
 
+async def ticket_cancel(callback: CallbackQuery, state: FSMContext, repo: Repo):
+    state_data: dict = await state.get_data()
+    category: str = state_data.get("category")
+    ticket_count: int = state_data.get("ticket_count")
+
+    try:
+        await callback.message.delete()
+
+    except MessageCantBeDeleted:
+        asset = await repo.get_asset("main_menu")
+        await callback.message.answer_photo(
+            asset.file_id,
+            caption=t("Выберите билет:"),
+            reply_markup=tickets_kb.get_kb(category, ticket_count)
+        )
+
+    except MessageToDeleteNotFound:
+        pass
+
+
 def register_exam(dp: Dispatcher):
     dp.register_callback_query_handler(
         ticket_select, cat_select_cb.filter(), state="*"
     )
     dp.register_callback_query_handler(
         ticket_show, show_ticket_cb.filter(), state="*"
+    )
+    dp.register_callback_query_handler(
+        ticket_cancel, ticket_cancel_cb.filter(), state="*"
     )
