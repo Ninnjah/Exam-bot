@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 
-from tgbot.database.tables import users, pages
+from tgbot.database.tables import assets, users, pages
 
 
 class Repo:
@@ -69,6 +69,31 @@ class Repo:
         """Returns page link from DB"""
         stmt = pages.select().where(
             pages.c.name == name
+        )
+
+        res = await self.conn.execute(stmt)
+
+        try:
+            return res.mappings().one()
+
+        except NoResultFound:
+            return None
+
+    async def add_asset(self, asset_id: str, file_id: str) -> None:
+        """Store asset in DB, ignore duplicates"""
+        stmt = insert(assets).values(
+            id=asset_id,
+            file_id=file_id
+        ).on_conflict_do_nothing()
+
+        await self.conn.execute(stmt)
+        await self.conn.commit()
+        return
+
+    async def get_asset(self, asset_id: str):
+        """Returns asset from DB"""
+        stmt = assets.select().where(
+            assets.c.id == asset_id
         )
 
         res = await self.conn.execute(stmt)
