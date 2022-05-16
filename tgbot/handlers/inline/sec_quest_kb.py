@@ -10,15 +10,21 @@ def get_kb():
     keyboard.add(
         InlineKeyboardButton(
             text=t("Трудовоe законодательство"),
-            callback_data=exam_start_cb.new("Tests_1")
+            callback_data=exam_start_cb.new(
+                category="Tests", ticket=1
+            )
         ),
         InlineKeyboardButton(
             text=t("Обучение по охране труда"),
-            callback_data=exam_start_cb.new("Tests_2")
+            callback_data=exam_start_cb.new(
+                category="Tests", ticket=2
+            )
         ),
         InlineKeyboardButton(
             text=t("Учет и расследование несчастных случаев"),
-            callback_data=exam_start_cb.new("Tests_3")
+            callback_data=exam_start_cb.new(
+                category="Tests", ticket=3
+            )
         ),
         InlineKeyboardButton(
             text=t("Назад"),
