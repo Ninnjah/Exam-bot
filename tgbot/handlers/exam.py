@@ -31,10 +31,12 @@ async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], 
 
 
 async def ticket_show(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
+    # get ticket category and ticket count from state storage
     state_data: dict = await state.get_data()
     category: str = state_data.get("category")
     ticket_count: int = state_data.get("ticket_count")
 
+    # Get ticket number from callback data
     ticket_data = callback_data.get("ticket")
 
     if ticket_data == "random":
