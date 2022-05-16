@@ -16,7 +16,7 @@ async def list_users(m: Message, repo: Repo):
             fullname = f"{user.firstname}{' ' + user.lastname if user.lastname is not None else ''}"
 
             msg_text += t(
-                "{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n"
+                t("{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n")
             ).format(
                 num=num,
                 user_id=user.user_id,
