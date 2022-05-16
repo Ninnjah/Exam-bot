@@ -1,5 +1,7 @@
 aiogram
 aioredis
-telegraph
-pyth3
+asyncpg
 lxml
+pyth3
+sqlalchemy[asyncio]
+telegraph
