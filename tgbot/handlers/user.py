@@ -40,7 +40,8 @@ async def user_start(m: Message, repo: Repo):
 
 
 async def return_to_main_menu(callback: CallbackQuery):
-    await callback.message.edit_reply_markup(
+    await callback.message.edit_caption(
+        caption=t("Экзаменационные билеты какой специальности вам нужны?"),
         reply_markup=main_kb.get_kb()
     )
 
