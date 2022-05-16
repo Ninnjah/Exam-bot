@@ -5,7 +5,7 @@ from tgbot.middlewares.locale import i18n as t
 
 
 def get_kb(category: str, ticket_number: int):
-    keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard = InlineKeyboardMarkup(row_width=2)
 
     keyboard.add(
         InlineKeyboardButton(
