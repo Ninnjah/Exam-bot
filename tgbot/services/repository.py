@@ -1,26 +1,66 @@
-from typing import List
+from typing import Optional
+
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio.engine import AsyncConnection
+
+from tgbot.database.tables import users, pages
 
 
 class Repo:
     """Db abstraction layer"""
 
-    def __init__(self, conn):
+    def __init__(self, conn: AsyncConnection):
         self.conn = conn
 
     # users
-    async def add_user(self, user_id) -> None:
+    async def add_user(
+            self,
+            user_id: int,
+            firstname: str,
+            lastname: Optional[str],
+            username: Optional[str]
+    ) -> None:
         """Store user in DB, ignore duplicates"""
-        # await self.conn.execute(
-        #     "INSERT INTO tg_users(userid) VALUES $1 ON CONFLICT DO NOTHING",
-        #     user_id,
-        # )
+        stmt = insert(users).values(
+            user_id=user_id,
+            firstname=firstname,
+            lastname=lastname,
+            username=username
+        ).on_conflict_do_nothing()
+
+        await self.conn.execute(stmt)
+        await self.conn.commit()
         return
 
-    async def list_users(self) -> List[int]:
+    def add_page(self, name: str, link: str) -> None:
+        """Store page in DB, ignore duplicates"""
+        stmt = insert(pages).values(
+            name=name,
+            link=link
+        ).on_conflict_do_nothing()
+
+        await self.conn.execute(stmt)
+        await self.conn.commit()
+        return
+
+    def get_page(self, name: str) -> Optional[str]:
+        """Returns page link from DB"""
+        stmt = pages.select().where(
+            pages.c.name == name
+        )
+
+        res = await self.conn.execute(stmt)
+
+        try:
+            return res.mappings().one()
+
+        except NoResultFound:
+            return None
+
+    async def list_users(self) -> list:
         """List all bot users"""
-        return [
-            # row[0]
-            # async for row in self.conn.execute(
-            #     "select userid from tg_users",
-            # )
-        ]
+        stmt = users.select()
+
+        res = await self.conn.execute(stmt)
+        return res.mappings().all()
