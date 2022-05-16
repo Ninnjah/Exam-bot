@@ -161,7 +161,7 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     for num, answer in enumerate(answers.keys(), start=1):
         msg_text += f"<b>{num}.</b> {answer}\n\n"
 
-    await callback.message.answer(
+    await callback.message.edit_text(
         msg_text,
         reply_markup=exam_answer_kb.get_kb(answers.values())
     )
