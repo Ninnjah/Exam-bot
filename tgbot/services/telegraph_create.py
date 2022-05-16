@@ -1,13 +1,17 @@
-import codecs
+import asyncio
+import logging
 
 from telegraph import Telegraph
+from telegraph.exceptions import RetryAfterError
 
 from tgbot.services.my_rtf_to_text import rtf_to_text
+
+logger = logging.getLogger(__name__)
 
 
 def get_rtf_text(filename: str) -> str:
     """Read RTF file and converts it to text"""
-    with codecs.open(filename, "r", "cp1251") as f:
+    with open(filename, "r", encoding="cp1251") as f:
         rtf = f.read()
 
     text = rtf_to_text(rtf, encoding="cp1251")
@@ -15,10 +19,16 @@ def get_rtf_text(filename: str) -> str:
     return text
 
 
-def create_page(filename: str, title: str) -> str:
+async def create_page(filename: str, title: str) -> str:
     """Creates telegraph page with text from RTF file"""
     telegraph = Telegraph()
-    telegraph.create_account(short_name="PolyER Exam bot")
+    try:
+        telegraph.create_account(short_name="PolyER Exam bot")
+
+    except RetryAfterError as e:
+        logger.warning(f"CREATE_PAGE: RetryAfterError - wait for {e.retry_after} secs")
+        await asyncio.sleep(e.retry_after)
+        telegraph.create_account(short_name="PolyER Exam bot")
 
     text = get_rtf_text(filename).split('\n')
 
