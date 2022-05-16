@@ -21,3 +21,11 @@ pages = Table(
     Column("created_on", DateTime(), default=datetime.now),
     Column("updated_on", DateTime(), default=datetime.now, onupdate=datetime.now)
 )
+
+assets = Table(
+    "assets", metadata,
+    Column("id", String(), primary_key=True),
+    Column("file_id", String(), nullable=False),
+    Column("created_on", DateTime(), default=datetime.now),
+    Column("updated_on", DateTime(), default=datetime.now, onupdate=datetime.now)
+)
