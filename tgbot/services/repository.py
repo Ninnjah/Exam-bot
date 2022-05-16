@@ -33,6 +33,13 @@ class Repo:
         await self.conn.commit()
         return
 
+    async def list_users(self) -> list:
+        """List all bot users"""
+        stmt = users.select()
+
+        res = await self.conn.execute(stmt)
+        return res.mappings().all()
+
     async def add_page(self, name: str, link: str) -> None:
         """Store page in DB, ignore duplicates"""
         stmt = insert(pages).values(
@@ -57,10 +64,3 @@ class Repo:
 
         except NoResultFound:
             return None
-
-    async def list_users(self) -> list:
-        """List all bot users"""
-        stmt = users.select()
-
-        res = await self.conn.execute(stmt)
-        return res.mappings().all()
