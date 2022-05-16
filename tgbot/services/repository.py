@@ -33,7 +33,7 @@ class Repo:
         await self.conn.commit()
         return
 
-    def add_page(self, name: str, link: str) -> None:
+    async def add_page(self, name: str, link: str) -> None:
         """Store page in DB, ignore duplicates"""
         stmt = insert(pages).values(
             name=name,
@@ -44,7 +44,7 @@ class Repo:
         await self.conn.commit()
         return
 
-    def get_page(self, name: str) -> Optional[str]:
+    async def get_page(self, name: str) -> Optional[str]:
         """Returns page link from DB"""
         stmt = pages.select().where(
             pages.c.name == name
