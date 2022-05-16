@@ -13,7 +13,7 @@ from telegraph.exceptions import TelegraphException
 from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb, \
     ticket_cancel_cb, exam_answer_cb, get_tip_cb, exam_result_cb, delete_cb
 from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb, \
-    exam_result_kb, delete_kb
+    exam_result_kb, delete_kb, exam_end_kb
 from tgbot.middlewares.locale import i18n as t
 from tgbot.services.repository import Repo
 from tgbot.services.ticket_parser import parse_ticket
@@ -260,7 +260,9 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
             score=current_score,
             max_score=max_score,
             correctness=(current_score / max_score) * 100
-        ))
+        ),
+            reply_markup=exam_end_kb.get_kb()
+        )
 
     else:
         await callback.message.answer(t(
@@ -271,7 +273,9 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
             score=current_score,
             max_score=max_score,
             correctness=(current_score / max_score) * 100
-        ))
+        ),
+            reply_markup=exam_end_kb.get_kb()
+        )
 
 
 def register_exam(dp: Dispatcher):
