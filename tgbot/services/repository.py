@@ -33,6 +33,20 @@ class Repo:
         await self.conn.commit()
         return
 
+    async def get_user(self, user_id: int):
+        """Returns user from DB by user id"""
+        stmt = users.select().where(
+            users.c.user_id == user_id
+        )
+
+        res = await self.conn.execute(stmt)
+
+        try:
+            return res.mappings().one()
+
+        except NoResultFound:
+            return
+
     async def list_users(self) -> list:
         """List all bot users"""
         stmt = users.select()
