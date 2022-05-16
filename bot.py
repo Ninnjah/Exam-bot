@@ -5,7 +5,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage
 
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy.pool import QueuePool
+
 from tgbot.config import load_config
+from tgbot.database.tables import metadata
 from tgbot.filters.role import RoleFilter, AdminFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.user import register_user
@@ -15,8 +20,16 @@ from tgbot.middlewares.role import RoleMiddleware
 logger = logging.getLogger(__name__)
 
 
-def create_pool(user, password, database, host, echo):
-    raise NotImplementedError  # TODO check your db connector
+async def create_pool(user, password, database, host, echo) -> AsyncEngine:
+    engine = create_async_engine(
+        f"postgresql+asyncpg://{user}:{password}@{host}/{database}",
+        pool_size=20, max_overflow=0, poolclass=QueuePool, echo=echo
+    )
+
+    async with engine.begin() as conn:
+        await conn.run_sync(metadata.create_all)
+
+    return engine
 
 
 async def main():
