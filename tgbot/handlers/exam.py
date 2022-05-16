@@ -12,8 +12,6 @@ from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb
 from tgbot.middlewares.locale import i18n as t
 from tgbot.services.repository import Repo
 
-ASSETS_PATH = Path("assets")
-
 
 async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
     await state.reset_state()
