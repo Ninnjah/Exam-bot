@@ -1,18 +1,25 @@
 import random
 from pathlib import Path
+import logging
 from typing import List, Dict
 
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InputFile
 from aiogram.utils.exceptions import MessageCantBeDeleted, MessageToDeleteNotFound
+
+from telegraph.exceptions import TelegraphException
 
 from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb, \
     ticket_cancel_cb, exam_answer_cb, get_tip_cb, exam_result_cb
-from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb, exam_result_kb
+from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb, \
+    exam_result_kb, delete_kb
 from tgbot.middlewares.locale import i18n as t
 from tgbot.services.repository import Repo
 from tgbot.services.ticket_parser import parse_ticket
+from tgbot.services.telegraph_create import create_page
+
+logger = logging.getLogger(__name__)
 
 
 async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
@@ -160,6 +167,70 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     )
 
 
+async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
+    # Get ticket data, current question number and score from state storage
+    state_data = await state.get_data()
+    ticket = state_data.get("ticket")
+    question_index = state_data.get("index")
+
+    # Get question tip
+    tip: str = ticket[question_index].get("info")
+    info_file = str(Path("Info", *tip.split("\\")))
+
+    if '.rtf' in tip:
+        title = tip.split('.')[-2].strip()
+        link = await repo.get_page(title)
+
+        if link is not None:
+            await callback.message.reply(link[0], reply_markup=delete_kb.get_kb())
+
+        else:
+            try:
+                link = await create_page(filename=info_file, title=title)
+
+            except TelegraphException as e:
+                logger.error(f"CREATE_PAGE: {e}", exc_info=True)
+                with open(info_file, 'rb') as f:
+                    await callback.message.reply_document(f, reply_markup=delete_kb.get_kb())
+
+            else:
+                await repo.add_page(title, link)
+                await callback.message.reply(
+                    link,
+                    reply_markup=delete_kb.get_kb()
+                )
+
+    else:
+        asset = await repo.get_asset(tip)
+        if asset:
+            if '.png' in tip:
+                await callback.message.reply_photo(
+                    asset.file_id,
+                    reply_markup=delete_kb.get_kb()
+                )
+            else:
+                await callback.message.reply_document(
+                    asset.file_id,
+                    reply_markup=delete_kb.get_kb()
+                )
+
+        else:
+            file_id = InputFile(info_file)
+            if '.png' in tip:
+                message = await callback.message.reply_photo(
+                    file_id,
+                    reply_markup=delete_kb.get_kb()
+                )
+                await repo.add_asset(info_file, message.photo[-1].file_id)
+
+            else:
+                message = await callback.message.reply_document(
+                    file_id,
+                    reply_markup=delete_kb.get_kb()
+                )
+                await repo.add_asset(info_file, message.document.file_id)
+
+
 def register_exam(dp: Dispatcher):
     dp.register_callback_query_handler(
         ticket_select, cat_select_cb.filter(), state="*"
@@ -175,4 +246,7 @@ def register_exam(dp: Dispatcher):
     )
     dp.register_callback_query_handler(
         ticket_answer, exam_answer_cb.filter(), state="*"
+    )
+    dp.register_callback_query_handler(
+        show_tip, get_tip_cb.filter(), state="*"
     )
