@@ -11,7 +11,7 @@ from aiogram.utils.exceptions import MessageCantBeDeleted, MessageToDeleteNotFou
 from telegraph.exceptions import TelegraphException
 
 from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb, \
-    ticket_cancel_cb, exam_answer_cb, get_tip_cb, exam_result_cb
+    ticket_cancel_cb, exam_answer_cb, get_tip_cb, exam_result_cb, delete_cb
 from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb, \
     exam_result_kb, delete_kb
 from tgbot.middlewares.locale import i18n as t
@@ -231,6 +231,17 @@ async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
                 await repo.add_asset(info_file, message.document.file_id)
 
 
+async def delete_tip(callback: CallbackQuery):
+    try:
+        await callback.message.delete()
+
+    except MessageCantBeDeleted:
+        pass
+
+    except MessageToDeleteNotFound:
+        pass
+
+
 def register_exam(dp: Dispatcher):
     dp.register_callback_query_handler(
         ticket_select, cat_select_cb.filter(), state="*"
@@ -249,4 +260,7 @@ def register_exam(dp: Dispatcher):
     )
     dp.register_callback_query_handler(
         show_tip, get_tip_cb.filter(), state="*"
+    )
+    dp.register_callback_query_handler(
+        delete_tip, delete_cb.filter(), state="*"
     )
