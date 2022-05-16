@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tgbot.cb_data import ticket_choose_cb, menu_explorer_cb
+from tgbot.cb_data import exam_start_cb, menu_explorer_cb
 from tgbot.middlewares.locale import i18n as t
 
 
@@ -11,7 +11,7 @@ def get_kb(category: str, ticket_count: int):
         keyboard.insert(
             InlineKeyboardButton(
                 text=str(ticket_number),
-                callback_data=ticket_choose_cb.new(
+                callback_data=exam_start_cb.new(
                     category=category, number=ticket_number
                 )
             )
@@ -20,7 +20,7 @@ def get_kb(category: str, ticket_count: int):
     keyboard.add(
         InlineKeyboardButton(
             text=t("Случайный билет"),
-            callback_data=ticket_choose_cb.new(
+            callback_data=exam_start_cb.new(
                 category=category, number="random"
             )
         )
