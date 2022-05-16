@@ -242,6 +242,38 @@ async def delete_tip(callback: CallbackQuery):
         pass
 
 
+async def exam_result(callback: CallbackQuery, state: FSMContext):
+    # Get ticket data, current question number and score from state storage
+    state_data = await state.get_data()
+    ticket = state_data.get("ticket")
+    current_score = state_data.get("score")
+
+    # Get number of questions (number of correct answers)
+    max_score = len(ticket)
+
+    if current_score == max_score:
+        await callback.message.answer(t(
+            "Экзамен сдан!\n"
+            "Вы ответили на {score} из {max_score}\n"
+            "Правильность ответов: {score:.0f}%"
+        ).format(
+            score=current_score,
+            max_score=max_score,
+            correctness=current_score / (max_score / 100)
+        ))
+
+    else:
+        await callback.message.answer(t(
+            "Экзамен не сдан!\n"
+            "Вы ответили на {score} из {max_score}\n"
+            "Правильность ответов: {score:.0f}%"
+        ).format(
+            score=current_score,
+            max_score=max_score,
+            correctness=current_score / (max_score / 100)
+        ))
+
+
 def register_exam(dp: Dispatcher):
     dp.register_callback_query_handler(
         ticket_select, cat_select_cb.filter(), state="*"
@@ -263,4 +295,7 @@ def register_exam(dp: Dispatcher):
     )
     dp.register_callback_query_handler(
         delete_tip, delete_cb.filter(), state="*"
+    )
+    dp.register_callback_query_handler(
+        exam_result, exam_result_cb.filter(), state="*"
     )
