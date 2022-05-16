@@ -16,6 +16,7 @@ from tgbot.handlers.admin import register_admin
 from tgbot.handlers.user import register_user
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
+from tgbot.middlewares.locale import i18n
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,7 @@ async def main():
 
     bot = Bot(token=config.tg_bot.token)
     dp = Dispatcher(bot, storage=storage)
+    dp.middleware.setup(i18n)
     dp.middleware.setup(DbMiddleware(pool))
     dp.middleware.setup(RoleMiddleware(config.tg_bot.admin_id))
     dp.filters_factory.bind(RoleFilter)
