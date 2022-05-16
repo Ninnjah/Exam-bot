@@ -102,7 +102,7 @@ async def ticket_start(callback: CallbackQuery, callback_data: Dict[str, str], s
     for num, answer in enumerate(answers.keys(), start=1):
         msg_text += f"<b>{num}.</b> {answer}\n\n"
 
-    await callback.message.answer(
+    await callback.message.edit_text(
         msg_text,
         reply_markup=exam_answer_kb.get_kb(answers.values())
     )
@@ -252,7 +252,7 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
     max_score = len(ticket)
 
     if current_score == max_score:
-        await callback.message.answer(t(
+        await callback.message.edit_text(t(
             "Экзамен сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
             "Правильность ответов: {correctness:.0f}%"
@@ -265,7 +265,7 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
         )
 
     else:
-        await callback.message.answer(t(
+        await callback.message.edit_text(t(
             "Экзамен не сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
             "Правильность ответов: {correctness:.0f}%"
