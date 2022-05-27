@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 from pathlib import Path
 import logging
@@ -88,8 +89,16 @@ async def ticket_start(callback: CallbackQuery, callback_data: Dict[str, str], s
     question_index: int = 0
     # Load ticket questions
     ticket: List[dict] = parse_ticket(f"exam/{category}/Paper_{ticket_number}.xml")
-    # Save current question number and ticket data in state storage and set state score to zero
-    await state.update_data(ticket=ticket, index=question_index, score=0)
+    # Save current question number, ticket number, start time
+    # and ticket data in state storage and set state score and tip count to zero
+    await state.update_data(
+        ticket_number=ticket_number,
+        start_time=datetime.now().timestamp(),
+        ticket=ticket,
+        index=question_index,
+        score=0,
+        tip_count=0
+    )
 
     # Get current question
     current_ticket = ticket[question_index]
@@ -124,6 +133,9 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     prev_answers = previous_question.get("answers")
     correct_answer = list(prev_answers.keys())[list(prev_answers.values()).index(1)]
 
+    # Save current question number and ticket data in state storage and set state score to zero
+    await state.update_data(index=question_index + 1, score=state_score + score)
+
     # Check correctness of the answer
     if score:
         await callback.answer(text=_("Правильно!"), show_alert=False)
@@ -151,9 +163,6 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     # Get answers for current question
     answers = current_ticket.get("answers")
 
-    # Save current question number and ticket data in state storage and set state score to zero
-    await state.update_data(index=question_index + 1, score=state_score + score)
-
     # Question text
     msg_text += _("{question}\n\n").format(
         question=current_ticket.get("text")
@@ -174,6 +183,10 @@ async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
     state_data = await state.get_data()
     ticket = state_data.get("ticket")
     question_index = state_data.get("index")
+
+    # Increase tip count
+    tip_count = state_data.get("tip_count")
+    await state.update_data(tip_count=tip_count + 1)
 
     # Get question tip
     tip: str = ticket[question_index].get("info")
@@ -244,16 +257,24 @@ async def delete_tip(callback: CallbackQuery):
         pass
 
 
-async def exam_result(callback: CallbackQuery, state: FSMContext):
+async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
     # Get ticket data, current question number and score from state storage
     state_data = await state.get_data()
     ticket = state_data.get("ticket")
-    current_score = state_data.get("score")
+
+    ticket_number: int = state_data.get("ticket_number")
+    category: str = state_data.get("category")
+    tip_count: int = state_data.get("tip_count")
+    current_score: int = state_data.get("score")
+    start_time: datetime = datetime.fromtimestamp(state_data.get("start_time"))
+    time_spent: float = (datetime.now() - start_time).total_seconds()
 
     # Get number of questions (number of correct answers)
     max_score = len(ticket)
 
-    if current_score == max_score:
+    success: bool = True if current_score == max_score else False
+
+    if success:
         await callback.message.edit_text(_(
             "Экзамен сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
@@ -278,6 +299,19 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
         ),
             reply_markup=exam_end_kb.get_kb()
         )
+
+    # Save statistic
+    await repo.add_statistic(
+        callback.from_user.id,
+        ticket_number=ticket_number,
+        ticket_category=category,
+        tip_count=tip_count,
+        questions=max_score,
+        score=current_score,
+        success=success,
+        time_spent=time_spent,
+        start_time=start_time
+    )
 
 
 def register_exam(dp: Dispatcher):
