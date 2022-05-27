@@ -22,10 +22,9 @@ from tgbot.middlewares.locale import i18n
 logger = logging.getLogger(__name__)
 
 
-async def create_pool(user, password, database, host, echo) -> AsyncEngine:
+async def create_pool(database_url, echo) -> AsyncEngine:
     engine = create_async_engine(
-        f"postgresql+asyncpg://{user}:{password}@{host}/{database}",
-        pool_size=20, max_overflow=0, poolclass=QueuePool, echo=echo
+        database_url, pool_size=20, max_overflow=0, poolclass=QueuePool, echo=echo
     )
 
     async with engine.begin() as conn:
@@ -40,17 +39,14 @@ async def main():
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
     logger.error("Starting bot")
-    config = load_config("bot.ini")
+    config = load_config()
 
     if config.tg_bot.use_redis:
         storage = RedisStorage2()
     else:
         storage = MemoryStorage()
     pool = await create_pool(
-        user=config.db.user,
-        password=config.db.password,
-        database=config.db.database,
-        host=config.db.host,
+        database_url=config.db.database_url,
         echo=False,
     )
 
