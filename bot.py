@@ -31,7 +31,7 @@ from tgbot.middlewares.locale import i18n
 logger = logging.getLogger(__name__)
 
 # webhook settings
-WEBHOOK_HOST = "https://polyer-exam-bot.herokuapp.com/"
+WEBHOOK_HOST = "https://polyer-exam-bot.herokuapp.com"
 WEBHOOK_PATH = "/bot"
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
