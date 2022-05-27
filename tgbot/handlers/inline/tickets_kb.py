@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from tgbot.cb_data import show_ticket_cb, menu_explorer_cb
-from tgbot.middlewares.locale import i18n as t
+from tgbot.middlewares.locale import _
 
 
 def get_kb(category: str, ticket_count: int):
@@ -19,7 +19,7 @@ def get_kb(category: str, ticket_count: int):
 
     keyboard.add(
         InlineKeyboardButton(
-            text=t("Случайный билет"),
+            text=_("Случайный билет"),
             callback_data=show_ticket_cb.new(
                 category=category, ticket="random"
             )
@@ -28,7 +28,7 @@ def get_kb(category: str, ticket_count: int):
 
     keyboard.add(
         InlineKeyboardButton(
-            text=t("Назад"),
+            text=_("Назад"),
             callback_data=menu_explorer_cb.new("main_menu")
         )
     )

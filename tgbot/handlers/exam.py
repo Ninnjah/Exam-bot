@@ -14,7 +14,7 @@ from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb, \
     ticket_cancel_cb, exam_answer_cb, get_tip_cb, exam_result_cb, delete_cb
 from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb, \
     exam_result_kb, delete_kb, exam_end_kb
-from tgbot.middlewares.locale import i18n as t
+from tgbot.middlewares.locale import _
 from tgbot.services.repository import Repo
 from tgbot.services.ticket_parser import parse_ticket
 from tgbot.services.telegraph_create import create_page
@@ -32,7 +32,7 @@ async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], 
     await state.update_data(category=category, ticket_count=ticket_count)
 
     await callback.message.edit_caption(
-        caption=t("Выберите билет:"),
+        caption=_("Выберите билет:"),
         reply_markup=tickets_kb.get_kb(category, ticket_count)
     )
 
@@ -53,7 +53,7 @@ async def ticket_show(callback: CallbackQuery, callback_data: Dict[str, str], st
         ticket_number = int(ticket_data)
 
     await callback.message.answer(
-        t("Ваш билет №{ticket}").format(ticket=ticket_number),
+        _("Ваш билет №{ticket}").format(ticket=ticket_number),
         reply_markup=ticket_confirm_kb.get_kb(category, ticket_number)
     )
 
@@ -70,7 +70,7 @@ async def ticket_cancel(callback: CallbackQuery, state: FSMContext, repo: Repo):
         asset = await repo.get_asset("main_menu")
         await callback.message.answer_photo(
             asset.file_id,
-            caption=t("Выберите билет:"),
+            caption=_("Выберите билет:"),
             reply_markup=tickets_kb.get_kb(category, ticket_count)
         )
 
@@ -126,11 +126,11 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
 
     # Check correctness of the answer
     if score:
-        await callback.answer(text=t("Правильно!"), show_alert=False)
+        await callback.answer(text=_("Правильно!"), show_alert=False)
 
     else:
-        await callback.answer(text=t("Неправильно!️"), show_alert=False)
-        msg_text += t(
+        await callback.answer(text=_("Неправильно!️"), show_alert=False)
+        msg_text += _(
             "<b>Правильный ответ на предыдущий вопрос:</b>️\n<i>{correct}</i>\n\n"
         ).format(
             correct=correct_answer
@@ -138,7 +138,7 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
 
     # If previous question was last
     if question_index + 1 >= len(ticket):
-        msg_text += t("Вы закончили!")
+        msg_text += _("Вы закончили!")
 
         await callback.message.edit_text(
             msg_text,
@@ -252,7 +252,7 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
     max_score = len(ticket)
 
     if current_score == max_score:
-        await callback.message.edit_text(t(
+        await callback.message.edit_text(_(
             "Экзамен сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
             "Правильность ответов: {correctness:.0f}%"
@@ -265,7 +265,7 @@ async def exam_result(callback: CallbackQuery, state: FSMContext):
         )
 
     else:
-        await callback.message.edit_text(t(
+        await callback.message.edit_text(_(
             "Экзамен не сдан!\n"
             "Вы ответили на {score} из {max_score}\n"
             "Правильность ответов: {correctness:.0f}%"

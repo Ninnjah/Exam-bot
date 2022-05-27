@@ -2,7 +2,7 @@ from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
-from tgbot.middlewares.locale import i18n as t
+from tgbot.middlewares.locale import _
 from tgbot.models.role import UserRole
 from tgbot.services.repository import Repo
 
@@ -11,12 +11,12 @@ async def list_users(m: Message, repo: Repo):
     users = await repo.list_users()
 
     if users:
-        msg_text = t("Список пользователей:\n")
+        msg_text = _("Список пользователей:\n")
         for num, user in enumerate(users, start=1):
             fullname = f"{user.firstname}{' ' + user.lastname if user.lastname is not None else ''}"
 
-            msg_text += t(
-                t("{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n")
+            msg_text += _(
+                _("{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n")
             ).format(
                 num=num,
                 user_id=user.user_id,
@@ -27,7 +27,7 @@ async def list_users(m: Message, repo: Repo):
         await m.answer(msg_text)
 
     else:
-        await m.answer(t("Еще никто не пользовался ботом"))
+        await m.answer(_("Еще никто не пользовался ботом"))
 
 
 def register_admin(dp: Dispatcher):

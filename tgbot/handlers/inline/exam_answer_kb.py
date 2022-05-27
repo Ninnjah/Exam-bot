@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from tgbot.cb_data import exam_answer_cb, get_tip_cb
-from tgbot.middlewares.locale import i18n as t
+from tgbot.middlewares.locale import _
 
 
 def get_kb(answers_scores: list):
@@ -17,7 +17,7 @@ def get_kb(answers_scores: list):
 
     keyboard.add(
         InlineKeyboardButton(
-            text=t("Подсказка"),
+            text=_("Подсказка"),
             callback_data=get_tip_cb.new()
         )
     )

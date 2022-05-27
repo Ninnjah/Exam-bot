@@ -11,4 +11,4 @@ LOCALES_DIR = BASE_DIR / "locales"
 i18n = I18nMiddleware(I18N_DOMAIN, LOCALES_DIR)
 
 # Alias for gettext method
-t = i18n.gettext
+_ = i18n.gettext

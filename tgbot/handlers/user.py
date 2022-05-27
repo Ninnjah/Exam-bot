@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery, InputFile
 
 from tgbot.cb_data import menu_explorer_cb
 from tgbot.handlers.inline import main_kb, sec_quest_kb
-from tgbot.middlewares.locale import i18n as t
+from tgbot.middlewares.locale import _
 from tgbot.services.repository import Repo
 
 ASSETS_PATH = Path("assets")
@@ -24,7 +24,7 @@ async def user_start(m: Message, repo: Repo):
         file_id = asset.file_id
         await m.answer_photo(
             file_id,
-            caption=t("Экзаменационные билеты какой специальности вам нужны?"),
+            caption=_("Экзаменационные билеты какой специальности вам нужны?"),
             reply_markup=main_kb.get_kb()
         )
 
@@ -33,7 +33,7 @@ async def user_start(m: Message, repo: Repo):
 
         message = await m.answer_photo(
             file_id,
-            caption=t("Экзаменационные билеты какой специальности вам нужны?"),
+            caption=_("Экзаменационные билеты какой специальности вам нужны?"),
             reply_markup=main_kb.get_kb()
         )
         await repo.add_asset("main_menu", message.photo[0].file_id)
@@ -41,14 +41,14 @@ async def user_start(m: Message, repo: Repo):
 
 async def return_to_main_menu(callback: CallbackQuery):
     await callback.message.edit_caption(
-        caption=t("Экзаменационные билеты какой специальности вам нужны?"),
+        caption=_("Экзаменационные билеты какой специальности вам нужны?"),
         reply_markup=main_kb.get_kb()
     )
 
 
 async def control_menu(callback: CallbackQuery):
     await callback.message.edit_caption(
-        caption=t("Какие контрольные вопросы вам нужны?"),
+        caption=_("Какие контрольные вопросы вам нужны?"),
         reply_markup=sec_quest_kb.get_kb()
     )
 

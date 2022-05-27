@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from tgbot.cb_data import delete_cb
-from tgbot.middlewares.locale import i18n as t
+from tgbot.middlewares.locale import _
 
 
 def get_kb():
@@ -9,7 +9,7 @@ def get_kb():
 
     keyboard.add(
         InlineKeyboardButton(
-            text=t("Удалить"),
+            text=_("Удалить"),
             callback_data=delete_cb.new()
         ),
     )
