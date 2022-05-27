@@ -141,7 +141,7 @@ class Repo:
             questions: int,
             score: int,
             success: bool,
-            time_spent: datetime,
+            time_spent: float,
             start_time: datetime
     ):
         stmt = insert(user_statistics).values(

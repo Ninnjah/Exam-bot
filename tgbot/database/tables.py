@@ -25,7 +25,7 @@ user_statistics = Table(
     Column("score", Integer(), nullable=False),
     Column("correctness", Float(), nullable=False),
     Column("success", Boolean(), nullable=False),
-    Column("time_spent", DateTime(), nullable=False),
+    Column("time_spent", Float(), nullable=False),
     Column("start_time", DateTime(), nullbale=False),
     Column("created_on", DateTime(), default=datetime.now),
 )
