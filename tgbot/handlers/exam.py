@@ -269,6 +269,8 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
     start_time: datetime = datetime.fromtimestamp(state_data.get("start_time"))
     time_spent: float = (datetime.now() - start_time).total_seconds()
 
+    donate_link = await repo.get_config("donate_link")
+
     # Get number of questions (number of correct answers)
     max_score = len(ticket)
 
@@ -284,7 +286,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
             max_score=max_score,
             correctness=(current_score / max_score) * 100
         ),
-            reply_markup=exam_end_kb.get_kb()
+            reply_markup=exam_end_kb.get_kb(donate_link.value)
         )
 
     else:
@@ -297,7 +299,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
             max_score=max_score,
             correctness=(current_score / max_score) * 100
         ),
-            reply_markup=exam_end_kb.get_kb()
+            reply_markup=exam_end_kb.get_kb(donate_link.value)
         )
 
     # Save statistic
