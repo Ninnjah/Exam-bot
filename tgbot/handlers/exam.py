@@ -155,7 +155,9 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     await state.update_data(index=question_index + 1, score=state_score + score)
 
     # Question text
-    msg_text += current_ticket.get("text") + "\n\n"
+    msg_text += _("{question}\n\n").format(
+        question=current_ticket.get("text")
+    )
 
     # Answer option texts with numeric
     for num, answer in enumerate(answers.keys(), start=1):
