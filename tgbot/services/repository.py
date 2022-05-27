@@ -1,10 +1,11 @@
 from typing import Optional
 
+from sqlalchemy import select, inspect
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 
-from tgbot.database.tables import assets, users, pages
+from tgbot.database.tables import assets, users, pages, config
 
 
 class Repo:
@@ -103,3 +104,29 @@ class Repo:
 
         except NoResultFound:
             return None
+
+    async def add_config(self, **kwargs):
+        primary_keys = [key.name for key in inspect(config).primary_key]
+
+        stmt = insert(config).values(
+            **kwargs
+        ).on_conflict_do_update(
+            index_elements=primary_keys, set_=kwargs
+        )
+
+        await self.conn.execute(stmt)
+        await self.conn.commit()
+        return
+
+    async def get_config(self, parameter: str):
+        stmt = select(config).where(
+            config.c.parameter == parameter
+        )
+
+        res = await self.conn.execute(stmt)
+
+        try:
+            return res.mappings().one()
+
+        except NoResultFound:
+            return
