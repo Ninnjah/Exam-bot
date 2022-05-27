@@ -16,7 +16,7 @@ users = Table(
 
 user_statistics = Table(
     "user_statistics", metadata,
-    Column("id", Integer(), primary_key=True, auto_increment=True),
+    Column("id", Integer(), primary_key=True),
     Column("user_id", BigInteger(), nullable=False),
     Column("ticket_number", Integer(), nullable=False),
     Column("ticket_category", String(), nullable=False),
@@ -26,7 +26,7 @@ user_statistics = Table(
     Column("correctness", Float(), nullable=False),
     Column("success", Boolean(), nullable=False),
     Column("time_spent", Float(), nullable=False),
-    Column("start_time", DateTime(), nullbale=False),
+    Column("start_time", DateTime(), nullable=False),
     Column("created_on", DateTime(), default=datetime.now),
 )
 
