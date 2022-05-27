@@ -13,6 +13,8 @@ from aiohttp.web_request import Request
 
 from aioredis.connection import ConnectionPool
 
+from dotenv import load_dotenv
+
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.pool import QueuePool
@@ -28,6 +30,10 @@ from tgbot.middlewares.role import RoleMiddleware
 from tgbot.middlewares.locale import i18n
 
 logger = logging.getLogger(__name__)
+
+if __name__ == "__main__":
+    load_dotenv(".env")
+
 config = load_config()
 
 if config.tg_bot.use_redis:
