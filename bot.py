@@ -5,6 +5,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
+from aioredis.connection import ConnectionPool
+
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.pool import QueuePool
@@ -42,9 +44,12 @@ async def main():
     config = load_config()
 
     if config.tg_bot.use_redis:
-        storage = RedisStorage2()
+        redis = ConnectionPool.from_url(config.redis.url)
+        storage = RedisStorage2(**redis.connection_kwargs)
+
     else:
         storage = MemoryStorage()
+
     pool = await create_pool(
         database_url=config.db.database_url,
         echo=False,

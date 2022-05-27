@@ -8,6 +8,11 @@ class DbConfig:
 
 
 @dataclass
+class RedisConfig:
+    url: str
+
+
+@dataclass
 class TgBot:
     token: str
     admin_id: int
@@ -18,6 +23,7 @@ class TgBot:
 class Config:
     tg_bot: TgBot
     db: DbConfig
+    redis: RedisConfig
 
 
 def cast_bool(value: str) -> bool:
@@ -36,4 +42,5 @@ def load_config():
         db=DbConfig(
             database_url=getenv("DATABASE_URL").replace("postgres://", "postgresql+asyncpg://")
         ),
+        redis=RedisConfig(url=getenv("REDIS_URL"))
     )
