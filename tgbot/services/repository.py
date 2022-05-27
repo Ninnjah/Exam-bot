@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import select, inspect
@@ -5,7 +6,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 
-from tgbot.database.tables import assets, users, pages, config
+from tgbot.database.tables import assets, users, pages, config, user_statistics
 
 
 class Repo:
@@ -130,3 +131,32 @@ class Repo:
 
         except NoResultFound:
             return
+
+    async def add_statistic(
+            self,
+            user_id: int,
+            ticket_number: int,
+            ticket_category: str,
+            tip_count: int,
+            questions: int,
+            score: int,
+            success: bool,
+            time_spent: datetime,
+            start_time: datetime
+    ):
+        stmt = insert(user_statistics).values(
+            user_id=user_id,
+            ticket_number=ticket_number,
+            ticket_category=ticket_category,
+            tip_count=tip_count,
+            questions=questions,
+            score=score,
+            correctness=score / questions * 100,
+            success=success,
+            time_spent=time_spent,
+            start_time=start_time
+        )
+
+        await self.conn.execute(stmt)
+        await self.conn.commit()
+        return
