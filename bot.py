@@ -161,7 +161,7 @@ else:
     app.on_shutdown.append(on_shutdown)
 
     configure_app(
-        dispatcher=app,
+        dispatcher=dp,
         app=app,
         path="/bot",
         route_name="bot-webhook"
