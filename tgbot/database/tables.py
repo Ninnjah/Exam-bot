@@ -29,3 +29,11 @@ assets = Table(
     Column("created_on", DateTime(), default=datetime.now),
     Column("updated_on", DateTime(), default=datetime.now, onupdate=datetime.now)
 )
+
+config = Table(
+    "config", metadata,
+    Column("parameter", String(), primary_key=True),
+    Column("value", String(), nullable=False),
+    Column("created_on", DateTime(), default=datetime.now),
+    Column("updated_on", DateTime(), default=datetime.now, onupdate=datetime.now)
+)
