@@ -7,7 +7,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from aiogram.dispatcher.webhook import configure_app, web
-from aiogram.utils.executor import start_polling
 from aiogram.utils.exceptions import RetryAfter
 
 from aiohttp.web_request import Request
@@ -29,6 +28,17 @@ from tgbot.middlewares.role import RoleMiddleware
 from tgbot.middlewares.locale import i18n
 
 logger = logging.getLogger(__name__)
+config = load_config()
+
+if config.tg_bot.use_redis:
+    redis = ConnectionPool.from_url(config.redis.url)
+    storage = RedisStorage2(**redis.connection_kwargs)
+
+else:
+    storage = MemoryStorage()
+
+bot = Bot(token=config.tg_bot.token, parse_mode="html")
+dp = Dispatcher(bot, storage=storage)
 
 # webhook settings
 WEBHOOK_HOST = "https://polyer-exam-bot.herokuapp.com"
@@ -68,22 +78,12 @@ async def polling_start():
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
     logger.error("Starting bot")
-    config = load_config()
-
-    if config.tg_bot.use_redis:
-        redis = ConnectionPool.from_url(config.redis.url)
-        storage = RedisStorage2(**redis.connection_kwargs)
-
-    else:
-        storage = MemoryStorage()
 
     pool = await create_pool(
         database_url=config.db.database_url,
         echo=False,
     )
 
-    bot = Bot(token=config.tg_bot.token, parse_mode="html")
-    dp = Dispatcher(bot, storage=storage)
     dp.middleware.setup(i18n)
     dp.middleware.setup(DbMiddleware(pool))
     dp.middleware.setup(RoleMiddleware(config.tg_bot.admin_id))
@@ -109,24 +109,10 @@ async def on_startup(app: web.Application):
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
     logger.error("Starting bot")
-    config = load_config()
-
-    if config.tg_bot.use_redis:
-        redis = ConnectionPool.from_url(config.redis.url)
-        storage = RedisStorage2(**redis.connection_kwargs)
-
-    else:
-        storage = MemoryStorage()
-
     pool = await create_pool(
         database_url=config.db.database_url,
         echo=False,
     )
-
-    bot = Bot(token=config.tg_bot.token, parse_mode="html")
-    dp = Dispatcher(bot, storage=storage)
-
-    app.update(bot=bot, dp=dp)
 
     dp.middleware.setup(i18n)
     dp.middleware.setup(DbMiddleware(pool))
@@ -153,9 +139,6 @@ async def on_startup(app: web.Application):
 async def on_shutdown(app: web.Application):
     logging.warning('Shutting down..')
 
-    bot = app.get("bot")
-    dp = app.get("dp")
-
     await bot.delete_webhook()
 
     await dp.storage.close()
@@ -178,7 +161,7 @@ else:
     app.on_shutdown.append(on_shutdown)
 
     configure_app(
-        dispatcher=app.get("dp"),
+        dispatcher=app,
         app=app,
         path="/bot",
         route_name="bot-webhook"
