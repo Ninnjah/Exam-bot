@@ -1,6 +1,8 @@
 aiogram
+aiohttp
 aioredis
 asyncpg
+gunicorn
 lxml
 pyth3
 sqlalchemy[asyncio]
