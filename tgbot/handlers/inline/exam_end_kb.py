@@ -16,7 +16,7 @@ def get_kb(donate_link: Optional[str]):
         ),
     )
 
-    if donate_link:
+    if donate_link is not None:
         keyboard.add(
             InlineKeyboardButton(
                 text=_("Отблагодарить разработчика"),
