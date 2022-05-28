@@ -7,7 +7,8 @@ from typing import List, Dict
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, InputFile
-from aiogram.utils.exceptions import MessageCantBeDeleted, MessageToDeleteNotFound
+from aiogram.utils.exceptions import MessageCantBeDeleted, \
+    MessageToDeleteNotFound, MessageNotModified
 
 from telegraph.exceptions import TelegraphException
 
@@ -23,7 +24,12 @@ from tgbot.services.telegraph_create import create_page
 logger = logging.getLogger(__name__)
 
 
-async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
+async def ticket_select(
+        callback: CallbackQuery,
+        callback_data: Dict[str, str],
+        repo: Repo,
+        state: FSMContext
+):
     await state.reset_state()
     # Test category (directory name)
     category: str = callback_data.get("category")
@@ -32,10 +38,27 @@ async def ticket_select(callback: CallbackQuery, callback_data: Dict[str, str], 
     ticket_count = len([x for x in category_path.iterdir()])
     await state.update_data(category=category, ticket_count=ticket_count)
 
-    await callback.message.edit_caption(
-        caption=_("Выберите билет:"),
-        reply_markup=tickets_kb.get_kb(category, ticket_count)
-    )
+    try:
+        await callback.message.edit_caption(
+            caption=_("Выберите билет:"),
+            reply_markup=tickets_kb.get_kb(category, ticket_count)
+        )
+
+    except MessageNotModified:
+        asset = await repo.get_asset("main_menu")
+        if asset:
+            file_id = asset.file_id
+            await callback.message.answer_photo(
+                file_id,
+                _("Выберите билет:"),
+                reply_markup=tickets_kb.get_kb(category, ticket_count)
+            )
+
+        else:
+            await callback.message.answer(
+                _("Выберите билет:"),
+                reply_markup=tickets_kb.get_kb(category, ticket_count)
+            )
 
 
 async def ticket_show(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
@@ -111,10 +134,17 @@ async def ticket_start(callback: CallbackQuery, callback_data: Dict[str, str], s
     for num, answer in enumerate(answers.keys(), start=1):
         msg_text += f"<b>{num}.</b> {answer}\n\n"
 
-    await callback.message.edit_text(
-        msg_text,
-        reply_markup=exam_answer_kb.get_kb(answers.values())
-    )
+    try:
+        await callback.message.edit_text(
+            msg_text,
+            reply_markup=exam_answer_kb.get_kb(answers.values())
+        )
+
+    except MessageNotModified:
+        await callback.message.answer(
+            msg_text,
+            reply_markup=exam_answer_kb.get_kb(answers.values())
+        )
 
 
 async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
@@ -152,11 +182,20 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     if question_index + 1 >= len(ticket):
         msg_text += _("Вы закончили!")
 
-        await callback.message.edit_text(
-            msg_text,
-            reply_markup=exam_result_kb.get_kb()
-        )
-        return
+        try:
+            await callback.message.edit_text(
+                msg_text,
+                reply_markup=exam_result_kb.get_kb()
+            )
+
+        except MessageNotModified:
+            await callback.message.answer(
+                msg_text,
+                reply_markup=exam_result_kb.get_kb()
+            )
+
+        finally:
+            return
 
     # Get current question
     current_ticket = ticket[question_index + 1]
@@ -172,10 +211,17 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     for num, answer in enumerate(answers.keys(), start=1):
         msg_text += f"<b>{num}.</b> {answer}\n\n"
 
-    await callback.message.edit_text(
-        msg_text,
-        reply_markup=exam_answer_kb.get_kb(answers.values())
-    )
+    try:
+        await callback.message.edit_text(
+            msg_text,
+            reply_markup=exam_answer_kb.get_kb(answers.values())
+        )
+
+    except MessageNotModified:
+        await callback.message.answer(
+            msg_text,
+            reply_markup=exam_answer_kb.get_kb(answers.values())
+        )
 
 
 async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
@@ -277,30 +323,58 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
     success: bool = True if current_score == max_score else False
 
     if success:
-        await callback.message.edit_text(_(
-            "Экзамен сдан!\n"
-            "Вы ответили на {score} из {max_score}\n"
-            "Правильность ответов: {correctness:.0f}%"
-        ).format(
-            score=current_score,
-            max_score=max_score,
-            correctness=(current_score / max_score) * 100
-        ),
-            reply_markup=exam_end_kb.get_kb(donate_link.value)
-        )
+        try:
+            await callback.message.edit_text(_(
+                "Экзамен сдан!\n"
+                "Вы ответили на {score} из {max_score}\n"
+                "Правильность ответов: {correctness:.0f}%"
+            ).format(
+                score=current_score,
+                max_score=max_score,
+                correctness=(current_score / max_score) * 100
+            ),
+                reply_markup=exam_end_kb.get_kb(donate_link.value)
+            )
+
+        except MessageNotModified:
+            await callback.message.answer(_(
+                "Экзамен сдан!\n"
+                "Вы ответили на {score} из {max_score}\n"
+                "Правильность ответов: {correctness:.0f}%"
+            ).format(
+                score=current_score,
+                max_score=max_score,
+                correctness=(current_score / max_score) * 100
+            ),
+                reply_markup=exam_end_kb.get_kb(donate_link.value)
+            )
 
     else:
-        await callback.message.edit_text(_(
-            "Экзамен не сдан!\n"
-            "Вы ответили на {score} из {max_score}\n"
-            "Правильность ответов: {correctness:.0f}%"
-        ).format(
-            score=current_score,
-            max_score=max_score,
-            correctness=(current_score / max_score) * 100
-        ),
-            reply_markup=exam_end_kb.get_kb(donate_link.value)
-        )
+        try:
+            await callback.message.edit_text(_(
+                "Экзамен не сдан!\n"
+                "Вы ответили на {score} из {max_score}\n"
+                "Правильность ответов: {correctness:.0f}%"
+            ).format(
+                score=current_score,
+                max_score=max_score,
+                correctness=(current_score / max_score) * 100
+            ),
+                reply_markup=exam_end_kb.get_kb(donate_link.value)
+            )
+
+        except MessageNotModified:
+            await callback.message.answer(_(
+                "Экзамен не сдан!\n"
+                "Вы ответили на {score} из {max_score}\n"
+                "Правильность ответов: {correctness:.0f}%"
+            ).format(
+                score=current_score,
+                max_score=max_score,
+                correctness=(current_score / max_score) * 100
+            ),
+                reply_markup=exam_end_kb.get_kb(donate_link.value)
+            )
 
     # Save statistic
     await repo.add_statistic(
