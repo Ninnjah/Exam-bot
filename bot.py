@@ -145,7 +145,7 @@ async def on_startup(app: web.Application):
 async def on_shutdown(app: web.Application):
     logging.warning('Shutting down..')
 
-    await bot.delete_webhook()
+    # await bot.delete_webhook()
 
     await dp.storage.close()
     await dp.storage.wait_closed()
