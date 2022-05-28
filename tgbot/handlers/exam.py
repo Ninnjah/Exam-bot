@@ -333,7 +333,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 max_score=max_score,
                 correctness=(current_score / max_score) * 100
             ),
-                reply_markup=exam_end_kb.get_kb(donate_link.value)
+                reply_markup=exam_end_kb.get_kb(donate_link)
             )
 
         except MessageNotModified:
@@ -346,7 +346,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 max_score=max_score,
                 correctness=(current_score / max_score) * 100
             ),
-                reply_markup=exam_end_kb.get_kb(donate_link.value)
+                reply_markup=exam_end_kb.get_kb(donate_link)
             )
 
     else:
