@@ -6,7 +6,7 @@ from tgbot.cb_data import ticket_cancel_cb
 from tgbot.middlewares.locale import _
 
 
-def get_kb(donate_link: Optional[str]):
+def get_kb(donate_link: Optional[dict]):
     keyboard = InlineKeyboardMarkup(row_width=1)
 
     keyboard.add(
@@ -20,7 +20,7 @@ def get_kb(donate_link: Optional[str]):
         keyboard.add(
             InlineKeyboardButton(
                 text=_("Отблагодарить разработчика"),
-                url=donate_link
+                url=donate_link.get("value")
             )
         )
 
