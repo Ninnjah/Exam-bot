@@ -232,6 +232,8 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
             reply_markup=exam_answer_kb.get_kb(answers.values())
         )
 
+    await callback.answer()
+
 
 async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
     # Get ticket data, current question number and score from state storage
