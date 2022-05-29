@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-05-29 20:14+0300\n"
-"PO-Revision-Date: 2022-05-29 20:22+0300\n"
+"POT-Creation-Date: 2022-05-29 22:39+0300\n"
+"PO-Revision-Date: 2022-05-29 22:40+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -48,14 +48,11 @@ msgid ""
 "{num}. <code>{user_id}</code> {ticket_num}:{ticket_cat} {score}/{questions}"
 "({correct:.2f}%) {spent:.0f} сек. [{start_time}]\n"
 msgstr ""
-"{num}. <code>{user_id}</code> <b>{ticket_cat}:{ticket_num}</b> "
-"<code>{score}/{questions}</code>({correct:.2f}%) {spent:.0f} сек. "
-"[{start_time}]\n"
+"{num}. <code>{user_id}</code> <b>{ticket_cat}:{ticket_num}</b> <code>{score}/"
+"{questions}</code>({correct:.2f}%) {spent:.0f} сек. [{start_time}]\n"
 
 # АДМИН. Пользователей еще не было
 #: tgbot/handlers/admin.py:80
-#, fuzzy
-#| msgid "Еще никто не пользовался ботом"
 msgid "Еще никто не решал билеты"
 msgstr "Еще никто не пользовался ботом 😔"
 
@@ -67,24 +64,24 @@ msgstr "Неверное количество аргументов!"
 msgid "Настройка <code>{parameter}={value}</code> сохранена"
 msgstr "Настройка <code>{parameter}={value}</code> сохранена"
 
-#: tgbot/handlers/exam.py:43 tgbot/handlers/exam.py:53
-#: tgbot/handlers/exam.py:59 tgbot/handlers/exam.py:97
+#: tgbot/handlers/exam.py:44 tgbot/handlers/exam.py:54
+#: tgbot/handlers/exam.py:60 tgbot/handlers/exam.py:98
 msgid "Выберите билет:"
 msgstr "Выберите билет:"
 
-#: tgbot/handlers/exam.py:80
+#: tgbot/handlers/exam.py:81
 msgid "Ваш билет №{ticket}"
 msgstr "Ваш билет №{ticket}"
 
-#: tgbot/handlers/exam.py:177
+#: tgbot/handlers/exam.py:180
 msgid "Правильно!"
 msgstr "Правильно! ✅"
 
-#: tgbot/handlers/exam.py:180
+#: tgbot/handlers/exam.py:183
 msgid "Неправильно!️"
 msgstr "Неправильно!️ ⚠️"
 
-#: tgbot/handlers/exam.py:181
+#: tgbot/handlers/exam.py:184
 msgid ""
 "<b>Правильный ответ на предыдущий вопрос:</b>️\n"
 "<i>{correct}</i>\n"
@@ -94,13 +91,13 @@ msgstr ""
 "<i>{correct}</i>\n"
 "\n"
 
-#: tgbot/handlers/exam.py:189
+#: tgbot/handlers/exam.py:192
 msgid "Вы закончили!"
 msgstr ""
 "Вы закончили!\n"
 "Давайте узнаем ваши результаты"
 
-#: tgbot/handlers/exam.py:212
+#: tgbot/handlers/exam.py:215
 msgid ""
 "{question}\n"
 "\n"
@@ -108,29 +105,41 @@ msgstr ""
 "❓{question}\n"
 "\n"
 
-#: tgbot/handlers/exam.py:333 tgbot/handlers/exam.py:346
+#: tgbot/handlers/exam.py:334
+msgid "минута минуты минут"
+msgstr "минута минуты минут"
+
+#: tgbot/handlers/exam.py:335
+msgid "секунда секунды секунд"
+msgstr "секунда секунды секунд"
+
+#: tgbot/handlers/exam.py:352 tgbot/handlers/exam.py:367
 msgid ""
 "Экзамен сдан!\n"
 "Вы ответили на {score} из {max_score}\n"
-"Правильность ответов: {correctness:.0f}%"
+"Правильность ответов: {correctness:.0f}%\n"
+"Вы потратили: {time_spent}"
 msgstr ""
 "🥳 Экзамен сдан! 🥳\n"
 "Вы ответили на {score} из {max_score}\n"
 "Правильность ответов: {correctness:.0f}%\n"
+"Вы потратили: {time_spent}\n"
 "\n"
 "Если вам нравится мой бот, то можете отблагодарить меня купив мне кофе. "
 "Можете отправить любую сумму нажав кнопку ниже.\n"
 "Надеюсь мой бот смог вам помочь☺️"
 
-#: tgbot/handlers/exam.py:360 tgbot/handlers/exam.py:373
+#: tgbot/handlers/exam.py:383 tgbot/handlers/exam.py:398
 msgid ""
 "Экзамен не сдан!\n"
 "Вы ответили на {score} из {max_score}\n"
-"Правильность ответов: {correctness:.0f}%"
+"Правильность ответов: {correctness:.0f}%\n"
+"Вы потратили: {time_spent}"
 msgstr ""
 "😔 Экзамен не сдан! 😔\n"
 "Вы ответили на {score} из {max_score}\n"
 "Правильность ответов: {correctness:.0f}%\n"
+"Вы потратили: {time_spent}\n"
 "\n"
 "Если вам нравится мой бот, то можете отблагодарить меня купив мне кофе. "
 "Можете отправить любую сумму нажав кнопку ниже.\n"
@@ -153,13 +162,13 @@ msgstr "Удалить 🗑"
 msgid "Подсказка"
 msgstr "💡 Подсказка 💡"
 
-#: tgbot/handlers/inline/exam_end_kb.py:14
-msgid "Закончить"
-msgstr "Закончить ✅"
-
-#: tgbot/handlers/inline/exam_end_kb.py:22
+#: tgbot/handlers/inline/exam_end_kb.py:15
 msgid "Отблагодарить разработчика"
 msgstr "Купите мне кофе ☕️"
+
+#: tgbot/handlers/inline/exam_end_kb.py:22
+msgid "Закончить"
+msgstr "Закончить ✅"
 
 #: tgbot/handlers/inline/exam_result_kb.py:12
 msgid "Показать результаты"

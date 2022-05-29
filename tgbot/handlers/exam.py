@@ -17,6 +17,7 @@ from tgbot.cb_data import cat_select_cb, show_ticket_cb, exam_start_cb, \
 from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb, \
     exam_result_kb, delete_kb, exam_end_kb
 from tgbot.middlewares.locale import _
+from tgbot.services.number_decl import get_declination
 from tgbot.services.repository import Repo
 from tgbot.services.ticket_parser import parse_ticket
 from tgbot.services.telegraph_create import create_page
@@ -105,7 +106,9 @@ async def ticket_cancel(callback: CallbackQuery, state: FSMContext, repo: Repo):
 async def ticket_start(callback: CallbackQuery, callback_data: Dict[str, str], state: FSMContext):
     # get ticket category and number from state storage
     state_data: dict = await state.get_data()
-    category: str = state_data.get("category")
+    category: str = state_data.get("category") \
+        if state_data.get("category") is not None \
+        else callback_data.get("category")
     ticket_number: int = int(callback_data.get("ticket"))
 
     # Current question index
@@ -328,16 +331,34 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
 
     success: bool = True if current_score == max_score else False
 
+    minutes_declines: list = _("минута минуты минут").split()
+    seconds_declines: list = _("секунда секунды секунд").split()
+
+    if time_spent <= 60:
+        sec_string: str = get_declination(time_spent, seconds_declines)
+
+        time_spent_string: str = f"{time_spent:.0f} {sec_string}"
+    else:
+        minutes: int = int(time_spent // 60)
+        seconds: int = int(time_spent - minutes * 60)
+
+        min_string: str = get_declination(minutes, minutes_declines)
+        sec_string: str = get_declination(seconds, seconds_declines)
+
+        time_spent_string: str = f"{minutes} {min_string} {seconds} {sec_string}"
+
     if success:
         try:
             await callback.message.edit_text(_(
                 "Экзамен сдан!\n"
                 "Вы ответили на {score} из {max_score}\n"
-                "Правильность ответов: {correctness:.0f}%"
+                "Правильность ответов: {correctness:.0f}%\n"
+                "Вы потратили: {time_spent}"
             ).format(
                 score=current_score,
                 max_score=max_score,
-                correctness=(current_score / max_score) * 100
+                correctness=(current_score / max_score) * 100,
+                time_spent=time_spent_string
             ),
                 reply_markup=exam_end_kb.get_kb(donate_link)
             )
@@ -346,11 +367,13 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
             await callback.message.answer(_(
                 "Экзамен сдан!\n"
                 "Вы ответили на {score} из {max_score}\n"
-                "Правильность ответов: {correctness:.0f}%"
+                "Правильность ответов: {correctness:.0f}%\n"
+                "Вы потратили: {time_spent}"
             ).format(
                 score=current_score,
                 max_score=max_score,
-                correctness=(current_score / max_score) * 100
+                correctness=(current_score / max_score) * 100,
+                time_spent=time_spent_string
             ),
                 reply_markup=exam_end_kb.get_kb(donate_link)
             )
@@ -360,11 +383,13 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
             await callback.message.edit_text(_(
                 "Экзамен не сдан!\n"
                 "Вы ответили на {score} из {max_score}\n"
-                "Правильность ответов: {correctness:.0f}%"
+                "Правильность ответов: {correctness:.0f}%\n"
+                "Вы потратили: {time_spent}"
             ).format(
                 score=current_score,
                 max_score=max_score,
-                correctness=(current_score / max_score) * 100
+                correctness=(current_score / max_score) * 100,
+                time_spent=time_spent_string
             ),
                 reply_markup=exam_end_kb.get_kb(donate_link)
             )
@@ -373,11 +398,13 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
             await callback.message.answer(_(
                 "Экзамен не сдан!\n"
                 "Вы ответили на {score} из {max_score}\n"
-                "Правильность ответов: {correctness:.0f}%"
+                "Правильность ответов: {correctness:.0f}%\n"
+                "Вы потратили: {time_spent}"
             ).format(
                 score=current_score,
                 max_score=max_score,
-                correctness=(current_score / max_score) * 100
+                correctness=(current_score / max_score) * 100,
+                time_spent=time_spent_string
             ),
                 reply_markup=exam_end_kb.get_kb(donate_link)
             )
