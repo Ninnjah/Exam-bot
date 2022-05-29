@@ -388,6 +388,12 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
         time_spent=time_spent,
         start_time=start_time
     )
+    await repo.add_user(
+        callback.from_user.id,
+        callback.from_user.first_name,
+        callback.from_user.last_name,
+        callback.from_user.username
+    )
 
 
 def register_exam(dp: Dispatcher):
