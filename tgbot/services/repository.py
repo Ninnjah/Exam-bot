@@ -168,3 +168,10 @@ class Repo:
         await self.conn.execute(stmt)
         await self.conn.commit()
         return
+
+    async def list_statistics(self):
+        """Returns all statistics from DB"""
+        stmt = select(user_statistics)
+
+        res = await self.conn.execute(stmt)
+        return res.mappings().all()
