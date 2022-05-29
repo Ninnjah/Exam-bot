@@ -16,11 +16,13 @@ async def list_users(m: Message, repo: Repo):
             fullname = f"{user.firstname}{' ' + user.lastname if user.lastname is not None else ''}"
 
             msg_text += _(
-                _("{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n")
+                "{num}. <code>{user_id}</code> "
+                "<a href='tg://user?id={user_id}'><b>{fullname}</b></a> {username}[{date}]\n"
             ).format(
                 num=num,
                 user_id=user.user_id,
                 fullname=fullname,
+                username=f"(@{user.username})" if user.username is not None else "",
                 date=user.created_on.strftime("%Y.%m.%d %H:%M")
             )
 

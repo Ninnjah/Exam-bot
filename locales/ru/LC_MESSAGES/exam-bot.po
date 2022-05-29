@@ -26,8 +26,12 @@ msgstr "Список пользователей:\n"
 
 # АДМИН. Шаблон строк пользователей
 #: tgbot/handlers/admin.py:19
-msgid "{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n"
-msgstr "{num}. <code>{user_id}</code> <b>{fullname}</b> [{date}]\n"
+msgid ""
+"{num}. <code>{user_id}</code> "
+"<a href='tg://user?id={user_id}'><b>{fullname}</b></a> {username}[{date}]\n"
+msgstr ""
+"{num}. <code>{user_id}</code> "
+"<a href='tg://user?id={user_id}'><b>{fullname}</b></a> {username}[{date}]\n"
 
 # АДМИН. Пользователей еще не было
 #: tgbot/handlers/admin.py:30
