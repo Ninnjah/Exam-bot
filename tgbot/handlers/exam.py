@@ -8,7 +8,7 @@ from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, InputFile
 from aiogram.utils.exceptions import MessageCantBeDeleted, \
-    MessageToDeleteNotFound, MessageNotModified
+    MessageToDeleteNotFound, MessageNotModified, BadRequest
 
 from telegraph.exceptions import TelegraphException
 
@@ -141,6 +141,12 @@ async def ticket_start(callback: CallbackQuery, callback_data: Dict[str, str], s
         )
 
     except MessageNotModified:
+        await callback.message.answer(
+            msg_text,
+            reply_markup=exam_answer_kb.get_kb(answers.values())
+        )
+
+    except BadRequest:
         await callback.message.answer(
             msg_text,
             reply_markup=exam_answer_kb.get_kb(answers.values())
