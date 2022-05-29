@@ -9,13 +9,6 @@ from tgbot.middlewares.locale import _
 def get_kb(donate_link: Optional[dict]):
     keyboard = InlineKeyboardMarkup(row_width=1)
 
-    keyboard.add(
-        InlineKeyboardButton(
-            text=_("Закончить"),
-            callback_data=ticket_cancel_cb.new()
-        ),
-    )
-
     if donate_link is not None:
         keyboard.add(
             InlineKeyboardButton(
@@ -23,5 +16,12 @@ def get_kb(donate_link: Optional[dict]):
                 url=donate_link.get("value")
             )
         )
+
+    keyboard.add(
+        InlineKeyboardButton(
+            text=_("Закончить"),
+            callback_data=ticket_cancel_cb.new()
+        ),
+    )
 
     return keyboard
