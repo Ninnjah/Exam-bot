@@ -32,9 +32,21 @@ async def list_users(m: Message, repo: Repo):
         await m.answer(_("Еще никто не пользовался ботом"))
 
 
+async def set_config(m: Message, repo: Repo):
+    args = m.get_args().split()
+    if len(args) != 2:
+        await m.answer(_("Неверное количество аргументов!"))
+        return
+
+    await repo.add_config(parameter=args[0], value=args[1])
+    await m.answer(_(
+        "Настройка <code>{parameter}={value}</code> сохранена"
+    ).format(
+        parameter=args[0],
+        value=args[1]
+    ))
+
+
 def register_admin(dp: Dispatcher):
     dp.register_message_handler(list_users, commands=["users"], state="*", role=UserRole.ADMIN)
-    # # or you can pass multiple roles:
-    # dp.register_message_handler(admin_start, commands=["start"], state="*", role=[UserRole.ADMIN])
-    # # or use another filter:
-    # dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
+    dp.register_message_handler(set_config, commands=["set"], state="*", role=UserRole.ADMIN)
