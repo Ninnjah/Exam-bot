@@ -23,13 +23,21 @@ class Repo:
             lastname: Optional[str],
             username: Optional[str]
     ) -> None:
-        """Store user in DB, ignore duplicates"""
+        """Store user in DB, on conflict updates user information"""
+        primary_keys = [key.name for key in inspect(users).primary_key]
+
         stmt = insert(users).values(
             user_id=user_id,
             firstname=firstname,
             lastname=lastname,
             username=username
-        ).on_conflict_do_nothing()
+        ).on_conflict_do_update(
+            index_elements=primary_keys, set_={
+                "firstname": firstname,
+                "lastname": lastname,
+                "username": username
+            }
+        )
 
         await self.conn.execute(stmt)
         await self.conn.commit()
