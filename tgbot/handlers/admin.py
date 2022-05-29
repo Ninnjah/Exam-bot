@@ -1,6 +1,8 @@
+from io import BytesIO
+
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, InputFile
 
 from tgbot.middlewares.locale import _
 from tgbot.models.role import UserRole
@@ -33,9 +35,27 @@ async def list_users(m: Message, repo: Repo):
 
 
 async def list_statistics(m: Message, repo: Repo):
+    args = m.get_args().split()
     stats = await repo.list_statistics()
 
-    if stats:
+    if args and args[0] == "file" and stats:
+        csv_file: BytesIO = BytesIO()
+        csv_text: str = "id,user_id,ticket_number,ticket_category," \
+                        "tip_count,questions,score,correctness," \
+                        "success,time_spent,start_time,created_on\n"
+
+        for num, stat in enumerate(stats, start=1):
+            csv_text += f"{num},{stat.user_id},{stat.ticket_number},\"{stat.ticket_category}\"," \
+                        f"{stat.tip_count},{stat.questions},{stat.score},{stat.correctness}," \
+                        f"{stat.success},{stat.time_spent},{stat.start_time},{stat.created_on}\n"
+
+        csv_file.write(csv_text.encode("utf-8"))
+        csv_file.seek(0)
+
+        await m.answer_document(InputFile(csv_file, "user_stats.csv"))
+        return
+
+    elif stats:
         msg_text = _("Статистика решения билетов:\n")
         for num, stat in enumerate(stats, start=1):
             msg_text += _(
