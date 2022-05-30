@@ -3,6 +3,7 @@ from io import BytesIO
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, InputFile
+from aiogram.utils import parts
 
 from tgbot.middlewares.locale import _
 from tgbot.models.role import UserRole
@@ -28,7 +29,12 @@ async def list_users(m: Message, repo: Repo):
                 date=user.created_on.strftime("%Y.%m.%d %H:%M")
             )
 
-        await m.answer(msg_text)
+        if len(msg_text) > parts.MAX_MESSAGE_LENGTH:
+            for message in parts.safe_split_text(msg_text, split_separator="\n"):
+                await m.answer(message)
+
+        else:
+            await m.answer(msg_text)
 
     else:
         await m.answer(_("Еще никто не пользовался ботом"))
@@ -74,7 +80,12 @@ async def list_statistics(m: Message, repo: Repo):
                 start_time=stat.start_time.strftime("%Y.%m.%d %H:%M")
             )
 
-        await m.answer(msg_text)
+        if len(msg_text) > parts.MAX_MESSAGE_LENGTH:
+            for message in parts.safe_split_text(msg_text, split_separator="\n"):
+                await m.answer(message)
+
+        else:
+            await m.answer(msg_text)
 
     else:
         await m.answer(_("Еще никто не решал билеты"))
