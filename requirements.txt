@@ -8,3 +8,6 @@ pyth3
 python-dotenv
 sqlalchemy[asyncio]
 telegraph
+numpy
+pandas
+matplotlib
