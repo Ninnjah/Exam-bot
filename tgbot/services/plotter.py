@@ -1,5 +1,6 @@
 from io import BytesIO
 
+import numpy as np
 from pandas import DataFrame
 
 import matplotlib.pyplot as plt
@@ -56,24 +57,28 @@ def user_top_plot(data: list):
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
     users = [str(x) for x in (all_tickets.keys())]
-    tickets = list(all_tickets.values())
+    tickets_data = [
+        list(all_tickets.values()),
+        list(failed_data.values()),
+        list(success_data.values())
+    ]
+    x_axis = np.arange(len(users))
+
     ax.bar(
-        users, tickets, label="Все билеты",
-        width=0.15, color="b"
-    )
-    users = [str(x) for x in (failed_data.keys())]
-    tickets = list(failed_data.values())
-    ax.bar(
-        users, tickets, label="Проваленые билеты",
+        x_axis - 0.15, tickets_data[1], label="Проваленые билеты",
         width=0.15, color="r"
     )
-    users = [str(x) for x in (success_data.keys())]
-    tickets = list(success_data.values())
     ax.bar(
-        users, tickets, label="Успешные билеты",
+        x_axis + 0.00, tickets_data[0], label="Все билеты",
+        width=0.15, color="b"
+    )
+    ax.bar(
+        x_axis + 0.15, tickets_data[2], label="Успешные билеты",
         width=0.15, color="g"
     )
-    fig.legend()
+
+    ax.set_xticks(x_axis, users)
+    ax.legend()
 
     # Save plot to bytesio
     plot_file: BytesIO = BytesIO()
