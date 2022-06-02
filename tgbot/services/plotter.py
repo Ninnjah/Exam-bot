@@ -77,6 +77,8 @@ def user_top_plot(data: list):
         width=0.15, color="g"
     )
 
+    ax.set_ylabel("Количество решенных билетов")
+    ax.set_title("Топ пользователей")
     ax.set_xticks(x_axis, users)
     ax.legend()
 
