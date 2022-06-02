@@ -68,6 +68,12 @@ async def list_statistics(m: Message, repo: Repo):
         await m.answer_photo(InputFile(plot_file, filename="stats.png"))
         return
 
+    elif args and args[0] == "top" and stats:
+        plot_file = plotter.user_top_plot(stats)
+
+        await m.answer_photo(InputFile(plot_file, filename="user_top.png"))
+        return
+
     elif stats:
         msg_text = _("Статистика решения билетов:\n")
         for num, stat in enumerate(stats, start=1):
