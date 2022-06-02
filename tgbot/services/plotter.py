@@ -55,8 +55,8 @@ def user_top_plot(data: list):
 
     # Load all users and all tickets
     user_data = data.value_counts("user_id").to_dict()
-    all_users: list = list(user_data.values())
-    all_tickets: list = list(user_data.keys())
+    all_users: list = list(user_data.keys())
+    all_tickets: list = list(user_data.values())
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
