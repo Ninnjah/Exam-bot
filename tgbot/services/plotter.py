@@ -55,22 +55,22 @@ def user_top_plot(data: list):
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    x = [str(x) for x in (all_tickets.keys())]
-    y = list(all_tickets.values())
+    users = [str(x) for x in (all_tickets.keys())]
+    tickets = list(all_tickets.values())
     ax.bar(
-        x, y, label="Все билеты",
+        users, tickets, label="Все билеты",
         width=0.15, color="b"
     )
-    x = [str(x) for x in (failed_data.keys())]
-    y = list(failed_data.values())
+    users = [str(x) for x in (failed_data.keys())]
+    tickets = list(failed_data.values())
     ax.bar(
-        x, y, label="Проваленые билеты",
+        users, tickets, label="Проваленые билеты",
         width=0.15, color="r"
     )
-    x = [str(x) for x in (success_data.keys())]
-    y = list(success_data.values())
+    users = [str(x) for x in (success_data.keys())]
+    tickets = list(success_data.values())
     ax.bar(
-        x, y, label="Успешные билеты",
+        users, tickets, label="Успешные билеты",
         width=0.15, color="g"
     )
     fig.legend()
