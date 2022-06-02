@@ -77,7 +77,7 @@ def user_top_plot(data: list):
     )
     ax.bar(
         *zip(*sorted(failed_data.items())), label="Проваленые билеты",
-        color=colors.red, bottom=sorted(success_data.values())
+        color=colors.red, bottom=[x[1] for x in sorted(success_data.items())]
     )
 
     # Format plot
