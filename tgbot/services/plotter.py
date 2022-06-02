@@ -47,39 +47,39 @@ def tickets_plot(data: list):
 
 def user_top_plot(data: list):
     data: DataFrame = DataFrame.from_records(data)
-    all_tickets = data.value_counts("user_id").to_dict()
 
     # Count of success and failed tickets
-    user_data: dict = data.groupby("user_id")["success"].value_counts().to_dict()
-    success_data: dict = {k[0]: i for k, i in user_data.items() if k[1] == True}
-    failed_data: dict = {k[0]: i for k, i in user_data.items() if k[1] == False}
+    tickets_data: dict = data.groupby("user_id")["success"].value_counts().to_dict()
+    success_data: list = [i for k, i in tickets_data.items() if k[1] == True]
+    failed_data: list = [i for k, i in tickets_data.items() if k[1] == False]
+
+    # Load all users and all tickets
+    user_data = data.value_counts("user_id").to_dict()
+    all_users: list = list(user_data.values())
+    all_tickets: list = list(user_data.keys())
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    users = [str(x) for x in (all_tickets.keys())]
-    tickets_data = [
-        list(all_tickets.values()),
-        list(failed_data.values()),
-        list(success_data.values())
-    ]
-    x_axis = np.arange(len(users))
+    x_axis = np.arange(len(all_users))
 
+    # Add data to plot
     ax.bar(
-        x_axis - 0.15, tickets_data[1], label="Проваленые билеты",
+        x_axis - 0.15, failed_data, label="Проваленые билеты",
         width=0.15, color="r"
     )
     ax.bar(
-        x_axis + 0.00, tickets_data[0], label="Все билеты",
+        x_axis + 0.00, all_tickets, label="Все билеты",
         width=0.15, color="b"
     )
     ax.bar(
-        x_axis + 0.15, tickets_data[2], label="Успешные билеты",
+        x_axis + 0.15, success_data, label="Успешные билеты",
         width=0.15, color="g"
     )
 
+    # Format plot
     ax.set_ylabel("Количество решенных билетов")
     ax.set_title("Топ пользователей")
-    ax.set_xticks(x_axis, users)
+    ax.set_xticks(x_axis, all_users)
     ax.legend()
 
     # Save plot to bytesio
