@@ -60,36 +60,30 @@ def user_top_plot(data: list):
 
     # Count of success and failed tickets
     tickets_data: dict = data.groupby("user_id")["success"].value_counts().to_dict()
-    success_data: list = [i for k, i in tickets_data.items() if k[1] == True]
-    failed_data: list = [i for k, i in tickets_data.items() if k[1] == False]
+    success_data: dict = {str(k[0]): i for k, i in tickets_data.items() if k[1] == True}
+    failed_data: dict = {str(k[0]): i for k, i in tickets_data.items() if k[1] == False}
 
-    # Load all users and all tickets
-    user_data = data.value_counts("user_id").to_dict()
-    all_users: list = list(user_data.keys())
-    all_tickets: list = list(user_data.values())
+    success_data.update({k: 0 for k, v in failed_data.items() if k not in success_data.keys()})
+    failed_data.update({k: 0 for k, v in success_data.items() if k not in failed_data.keys()})
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    x_axis = np.arange(len(all_users))
+    x_axis = np.arange(len(success_data))
 
     # Add data to plot
     ax.bar(
-        x_axis - 0.15, failed_data, label="Проваленые билеты",
-        width=0.15, color=colors.red
+        *zip(*sorted(success_data.items())), label="Успешные билеты",
+        color=colors.green
     )
     ax.bar(
-        x_axis + 0.00, all_tickets, label="Все билеты",
-        width=0.15, color=colors.yellow
-    )
-    ax.bar(
-        x_axis + 0.15, success_data, label="Успешные билеты",
-        width=0.15, color=colors.green
+        *zip(*sorted(failed_data.items())), label="Проваленые билеты",
+        color=colors.red, bottom=sorted(success_data.values())
     )
 
     # Format plot
     ax.set_ylabel("Количество решенных билетов")
     ax.set_title("Топ пользователей")
-    ax.set_xticks(x_axis, all_users)
+    ax.set_xticks(x_axis, success_data.keys())
     ax.legend()
 
     # Save plot to bytesio
