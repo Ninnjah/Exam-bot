@@ -7,6 +7,7 @@ from aiogram.utils import parts
 
 from tgbot.middlewares.locale import _
 from tgbot.models.role import UserRole
+from tgbot.services import plotter
 from tgbot.services.repository import Repo
 
 
@@ -59,6 +60,12 @@ async def list_statistics(m: Message, repo: Repo):
         csv_file.seek(0)
 
         await m.answer_document(InputFile(csv_file, "user_stats.csv"))
+        return
+
+    elif args and args[0] == "plot" and stats:
+        plot_file = plotter.tickets_plot(stats)
+
+        await m.answer_photo(InputFile(plot_file, filename="stats.png"))
         return
 
     elif stats:
