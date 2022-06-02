@@ -1,3 +1,4 @@
+from collections import namedtuple
 from io import BytesIO
 
 import numpy as np
@@ -6,6 +7,15 @@ from pandas import DataFrame
 import matplotlib.pyplot as plt
 
 plt.style.use("bmh")
+Colors = namedtuple(
+    "colors",
+    ("red", "yellow", "green")
+)
+colors = Colors._make({
+    "#BB5555": "red",
+    "#EE9944": "yellow",
+    "#99BB55": "green"
+})
 
 
 def tickets_plot(data: list):
@@ -25,15 +35,15 @@ def tickets_plot(data: list):
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.fill_between(
         *zip(*sorted(all_tickets.items())), y2=0, label="Все билеты",
-        alpha=0.5, color="b", linewidth=2
+        alpha=0.5, color=colors.yellow, linewidth=2
     )
     ax.fill_between(
         *zip(*sorted(failed_data.items())), y2=0, label="Проваленые билеты",
-        alpha=0.5, color="r", linewidth=2
+        alpha=0.5, color=colors.red, linewidth=2
     )
     ax.fill_between(
         *zip(*sorted(success_data.items())), y2=0, label="Успешные билеты",
-        alpha=0.5, color="g", linewidth=2
+        alpha=0.5, color=colors.green, linewidth=2
     )
     fig.legend()
 
@@ -65,15 +75,15 @@ def user_top_plot(data: list):
     # Add data to plot
     ax.bar(
         x_axis - 0.15, failed_data, label="Проваленые билеты",
-        width=0.15, color="r"
+        width=0.15, color=colors.red
     )
     ax.bar(
         x_axis + 0.00, all_tickets, label="Все билеты",
-        width=0.15, color="b"
+        width=0.15, color=colors.yellow
     )
     ax.bar(
         x_axis + 0.15, success_data, label="Успешные билеты",
-        width=0.15, color="g"
+        width=0.15, color=colors.green
     )
 
     # Format plot
