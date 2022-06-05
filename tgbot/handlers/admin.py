@@ -76,7 +76,7 @@ async def list_statistics(m: Message, repo: Repo):
 
     elif stats:
         msg_text = _("Статистика решения билетов:\n")
-        for num, stat in enumerate(stats, start=1):
+        for num, stat in enumerate(stats[:50], start=1):
             msg_text += _(
                 "{num}. <code>{user_id}</code> {ticket_num}:{ticket_cat}"
                 " {score}/{questions}({correct:.2f}%) "
