@@ -78,20 +78,20 @@ def tickets_stat(data: list):
     # Collect data
     for start_date, success in zip(data["start_date"], data["success"]):
         if not all_count:
-            all_tickets.update({str(start_date): 0})
-            success_tickets.update({str(start_date): 0})
-            failed_tickets.update({str(start_date): 0})
+            all_tickets.update({start_date: 0})
+            success_tickets.update({start_date: 0})
+            failed_tickets.update({start_date: 0})
 
         all_count += 1
-        all_tickets.update({str(start_date): all_count})
+        all_tickets.update({start_date: all_count})
 
         if success:
             success_count += 1
-            success_tickets.update({str(start_date): success_count})
+            success_tickets.update({start_date: success_count})
 
         else:
             failed_count += 1
-            failed_tickets.update({str(start_date): failed_count})
+            failed_tickets.update({start_date: failed_count})
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -152,6 +152,50 @@ def user_top_plot(data: list):
     ax.set_ylabel("Количество решенных билетов")
     ax.set_title("Топ пользователей")
     ax.set_xticks(x_axis, success_data.keys())
+    ax.legend()
+
+    # Save plot to bytesio
+    plot_file: BytesIO = BytesIO()
+    fig.savefig(plot_file)
+    plot_file.seek(0)
+
+    return plot_file
+
+
+def users_stat(data: list):
+    data: DataFrame = DataFrame.from_records(
+        data
+    ).sort_values(
+        by=["created_on"]
+    )
+
+    # Create date column
+    data["created_date"] = data["created_on"].dt.date
+
+    # Create variables for data
+    users_count: int = 0
+    users: dict = {}
+
+    # Collect data
+    for created_date in data["created_date"]:
+        if not users_count:
+            users.update({created_date: 0})
+
+        users_count += 1
+        users.update({created_date: users_count})
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Add data to plot
+    ax.plot(
+        *zip(*sorted(users.items())), label="Все пользователи",
+        color=colors.green
+    )
+
+    # Format plot
+    ax.set_ylabel("Количество пользователей")
+    ax.set_title("Динамика пользователей")
     ax.legend()
 
     # Save plot to bytesio

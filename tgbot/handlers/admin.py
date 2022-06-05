@@ -12,9 +12,16 @@ from tgbot.services.repository import Repo
 
 
 async def list_users(m: Message, repo: Repo):
+    args = m.get_args().split()
     users = await repo.list_users()
 
-    if users:
+    if args and args[0] == "all" and users:
+        plot_file = plotter.users_stat(users)
+
+        await m.answer_photo(InputFile(plot_file, filename="users_stat.png"))
+        return
+
+    elif users:
         msg_text = _("Список пользователей:\n")
         for num, user in enumerate(users, start=1):
             fullname = f"{user.firstname}{' ' + user.lastname if user.lastname is not None else ''}"
