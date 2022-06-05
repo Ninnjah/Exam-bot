@@ -88,10 +88,12 @@ def tickets_stat(data: list):
         if success:
             success_count += 1
             success_tickets.update({start_date: success_count})
+            failed_tickets.update({start_date: failed_count})
 
         else:
             failed_count += 1
             failed_tickets.update({start_date: failed_count})
+            success_tickets.update({start_date: success_count})
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
