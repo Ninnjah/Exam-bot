@@ -59,7 +59,7 @@ class Repo:
 
     async def list_users(self) -> list:
         """List all bot users"""
-        stmt = users.select()
+        stmt = users.select().order_by(users.c.created_on)
 
         res = await self.conn.execute(stmt)
         return res.mappings().all()
@@ -171,7 +171,7 @@ class Repo:
 
     async def list_statistics(self):
         """Returns all statistics from DB"""
-        stmt = select(user_statistics)
+        stmt = select(user_statistics).order_by(user_statistics.c.created_on)
 
         res = await self.conn.execute(stmt)
         return res.mappings().all()
