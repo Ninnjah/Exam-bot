@@ -55,6 +55,74 @@ def tickets_plot(data: list):
     return plot_file
 
 
+def tickets_stat(data: list):
+    data: DataFrame = DataFrame.from_records(
+        data
+    ).sort_values(
+        by=["start_time"]
+    )
+
+    # Create date column
+    data["start_date"] = data["start_time"].dt.date
+
+    # Create variables for data
+    all_count: int = 0
+    all_tickets: dict = {}
+
+    success_tickets: dict = {}
+    success_count: int = 0
+
+    failed_tickets: dict = {}
+    failed_count: int = 0
+
+    # Collect data
+    for start_date, success in zip(data["start_date"], data["success"]):
+        if not all_count:
+            all_tickets.update({str(start_date): 0})
+            success_tickets.update({str(start_date): 0})
+            failed_tickets.update({str(start_date): 0})
+
+        all_count += 1
+        all_tickets.update({str(start_date): all_count})
+
+        if success:
+            success_count += 1
+            success_tickets.update({str(start_date): success_count})
+
+        else:
+            failed_count += 1
+            failed_tickets.update({str(start_date): failed_count})
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Add data to plot
+    ax.plot(
+        *zip(*sorted(all_tickets.items())), label="Все билеты",
+        color=colors.yellow
+    )
+    ax.plot(
+        *zip(*sorted(success_tickets.items())), label="Успешные билеты",
+        color=colors.green
+    )
+    ax.plot(
+        *zip(*sorted(failed_tickets.items())), label="Неуспешные билеты",
+        color=colors.red
+    )
+
+    # Format plot
+    ax.set_ylabel("Количество решенных билетов")
+    ax.set_title("Все решенные билеты")
+    ax.legend()
+
+    # Save plot to bytesio
+    plot_file: BytesIO = BytesIO()
+    fig.savefig(plot_file)
+    plot_file.seek(0)
+
+    return plot_file
+
+
 def user_top_plot(data: list):
     data: DataFrame = DataFrame.from_records(data)
 
