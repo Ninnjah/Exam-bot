@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import select, inspect
+from sqlalchemy import select, inspect, desc
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
@@ -171,7 +171,7 @@ class Repo:
 
     async def list_statistics(self):
         """Returns all statistics from DB"""
-        stmt = select(user_statistics).order_by(user_statistics.c.created_on)
+        stmt = select(user_statistics).order_by(desc(user_statistics.c.created_on))
 
         res = await self.conn.execute(stmt)
         return res.mappings().all()
