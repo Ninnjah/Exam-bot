@@ -77,23 +77,15 @@ def tickets_stat(data: list):
 
     # Collect data
     for start_date, success in zip(data["start_date"], data["success"]):
-        if not all_count:
-            all_tickets.update({start_date: 0})
-            success_tickets.update({start_date: 0})
-            failed_tickets.update({start_date: 0})
-
         all_count += 1
-        all_tickets.update({start_date: all_count})
-
         if success:
             success_count += 1
-            success_tickets.update({start_date: success_count})
-            failed_tickets.update({start_date: failed_count})
-
         else:
             failed_count += 1
-            failed_tickets.update({start_date: failed_count})
-            success_tickets.update({start_date: success_count})
+
+        all_tickets.update({start_date: all_count})
+        success_tickets.update({start_date: success_count})
+        failed_tickets.update({start_date: failed_count})
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -180,9 +172,6 @@ def users_stat(data: list):
 
     # Collect data
     for created_date in data["created_date"]:
-        if not users_count:
-            users.update({created_date: 0})
-
         users_count += 1
         users.update({created_date: users_count})
 
