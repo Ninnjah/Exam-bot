@@ -117,38 +117,45 @@ def tickets_stat(data: list):
     return plot_file
 
 
-def user_top_plot(data: list):
-    data: DataFrame = DataFrame.from_records(data)
+def user_top_plot(raw_data: list):
+    data: DataFrame = DataFrame.from_records(raw_data)
 
-    # Count of success and failed tickets
-    tickets_data: dict = data.groupby("user_id")["success"].value_counts().to_dict()
-    success_raw_data: dict = {str(k[0]): i for k, i in tickets_data.items() if k[1] == True}
-    failed_raw_data: dict = {str(k[0]): i for k, i in tickets_data.items() if k[1] == False}
+    tickets_data: DataFrame = DataFrame()
+    tickets_data["user_id"] = data["user_id"]
+    tickets_data["success"] = data["success"]
+    tickets_data["success_count"] = tickets_data.groupby(["user_id", "success"])["success"].transform("count")
 
-    success_raw_data.update({k: 0 for k, v in failed_raw_data.items() if k not in success_raw_data.keys()})
-    success_data = sorted(success_raw_data.items(), key=lambda item: item[1], reverse=True)
+    success_y = [
+        x[0] for x in zip(
+            tickets_data["success_count"],
+            tickets_data["success"]
+        ) if x[1]
+    ]
 
-    failed_raw_data.update({k: 0 for k, v in success_raw_data.items() if k not in failed_raw_data.keys()})
-    failed_data = sorted(failed_raw_data.items(), key=lambda item: item[1], reverse=True)
+    failed_y = [
+        x[0] for x in zip(
+            tickets_data["success_count"],
+            tickets_data["success"]
+        ) if not x[1]
+    ]
 
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
-    x_axis = np.arange(len(success_data))
 
     # Add data to plot
     ax.bar(
-        *zip(*success_data), label="Успешные билеты",
-        color=colors.green
+        x=tickets_data["user_id"], height=success_y,
+        label="Успешные билеты", color=colors.green
     )
     ax.bar(
-        *zip(*failed_data), label="Проваленые билеты",
-        color=colors.red, bottom=[x[1] for x in success_data]
+        x=tickets_data["user_id"], height=failed_y,
+        label="Проваленые билеты", color=colors.green,
+        bottom=success_y
     )
 
     # Format plot
     ax.set_ylabel("Количество решенных билетов")
     ax.set_title("Топ пользователей")
-    ax.set_xticks(x_axis, [x[0] for x in success_data])
     ax.legend()
 
     # Save plot to bytesio
