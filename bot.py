@@ -80,7 +80,7 @@ async def main():
             await dp.start_polling()
         else:
             await bot.set_webhook(config.webhook.domain + config.webhook.path)
-            start_webhook(
+            await start_webhook(
                 dispatcher=dp,
                 webhook_path=config.webhook.path,
                 skip_updates=True,
