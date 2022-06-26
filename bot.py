@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
-from aiogram.utils.executor import start_webhook
+from aiogram.dispatcher.webhook import configure_app, web
 
 from dotenv import load_dotenv
 if __name__ == "__main__":
@@ -79,13 +79,13 @@ async def main():
         if not config.webhook.domain:
             await dp.start_polling()
         else:
+            app = web.Application()
             await bot.set_webhook(config.webhook.domain + config.webhook.path)
-            await start_webhook(
+            configure_app(
                 dispatcher=dp,
-                webhook_path=config.webhook.path,
-                skip_updates=True,
-                host=config.webhook.host,
-                port=config.webhook.port,
+                app=app,
+                path="/bot",
+                route_name="bot-webhook"
             )
 
     finally:
