@@ -38,6 +38,11 @@ async def create_pool(database_url, echo) -> AsyncEngine:
     return engine
 
 
+async def on_shutdown(dp: Dispatcher):
+    await dp.storage.close()
+    await dp.storage.wait_closed()
+
+
 async def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -75,23 +80,25 @@ async def main():
     register_exam(dp)
 
     # start
-    try:
-        if not config.webhook.domain:
+    if not config.webhook.domain:
+        try:
             await dp.start_polling()
-        else:
-            app = web.Application()
-            await bot.set_webhook(config.webhook.domain + config.webhook.path)
-            configure_app(
-                dispatcher=dp,
-                app=app,
-                path="/bot",
-                route_name="bot-webhook"
-            )
 
-    finally:
-        await dp.storage.close()
-        await dp.storage.wait_closed()
-        await bot.session.close()
+        finally:
+            await dp.storage.close()
+            await dp.storage.wait_closed()
+            await bot.session.close()
+
+    else:
+        app = web.Application()
+        await bot.set_webhook(config.webhook.domain + config.webhook.path)
+        app.on_shutdown.append(on_shutdown)
+        configure_app(
+            dispatcher=dp,
+            app=app,
+            path="/bot",
+            route_name="bot-webhook"
+        )
 
 
 if __name__ == '__main__':
