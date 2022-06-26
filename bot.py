@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from aiogram.dispatcher.webhook import configure_app, web
+from aiogram.utils.exceptions import RetryAfter
 
 from dotenv import load_dotenv
 if __name__ == "__main__":
@@ -36,11 +37,6 @@ async def create_pool(database_url, echo) -> AsyncEngine:
         await conn.run_sync(metadata.create_all)
 
     return engine
-
-
-async def on_shutdown(dp: Dispatcher):
-    await dp.storage.close()
-    await dp.storage.wait_closed()
 
 
 async def main():
@@ -90,15 +86,41 @@ async def main():
             await bot.session.close()
 
     else:
-        app = web.Application()
         await bot.set_webhook(config.webhook.domain + config.webhook.path)
+        app = web.Application()
+        app["bot"] = bot
+        app["config"] = config
+        app["dp"] = dp
+
+        app.on_startup.append(on_startup)
         app.on_shutdown.append(on_shutdown)
+
         configure_app(
             dispatcher=dp,
             app=app,
             path="/bot",
             route_name="bot-webhook"
         )
+
+
+async def on_startup(app: web.Application):
+    while True:
+        try:
+            await app["bot"].set_webhook(
+                app["config"].webhook.domain + app["config"].webhook.path
+            )
+
+        except RetryAfter as e:
+            logger.warning(f"Flood wait for {e.timeout} sec")
+            await asyncio.sleep(e.timeout)
+
+        else:
+            break
+
+
+async def on_shutdown(app: web.Application):
+    await app["dp"].storage.close()
+    await app["dp"].storage.wait_closed()
 
 
 if __name__ == '__main__':
