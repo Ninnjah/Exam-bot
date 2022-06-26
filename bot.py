@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Optional
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -26,6 +27,19 @@ from tgbot.middlewares.role import RoleMiddleware
 from tgbot.middlewares.locale import i18n
 
 logger = logging.getLogger(__name__)
+# Load config
+config = load_config()
+
+# Setup FSM storage
+if config.tg_bot.use_redis:
+    storage = RedisStorage2()
+else:
+    storage = MemoryStorage()
+
+# Create bot instance
+bot = Bot(token=config.tg_bot.token, parse_mode="html")
+# Create Dispatcher instance
+dp = Dispatcher(bot, storage=storage)
 
 
 async def create_pool(database_url, echo) -> AsyncEngine:
@@ -39,31 +53,18 @@ async def create_pool(database_url, echo) -> AsyncEngine:
     return engine
 
 
-async def main():
+async def start_polling():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
     logger.error("Starting bot")
-    # Load config
-    config = load_config()
-
-    # Setup FSM storage
-    if config.tg_bot.use_redis:
-        storage = RedisStorage2()
-    else:
-        storage = MemoryStorage()
 
     # Create database connection pool
     pool = await create_pool(
         database_url=config.db.database_url,
         echo=False,
     )
-
-    # Create bot instance
-    bot = Bot(token=config.tg_bot.token, parse_mode="html")
-    # Create Dispatcher instance
-    dp = Dispatcher(bot, storage=storage)
 
     dp.middleware.setup(i18n)
     dp.middleware.setup(DbMiddleware(pool))
@@ -76,38 +77,42 @@ async def main():
     register_exam(dp)
 
     # start
-    if not config.webhook.domain:
-        try:
-            await dp.start_polling()
+    try:
+        await dp.start_polling()
 
-        finally:
-            await dp.storage.close()
-            await dp.storage.wait_closed()
-            await bot.session.close()
-
-    else:
-        await bot.set_webhook(config.webhook.domain + config.webhook.path)
-        app = web.Application()
-        app["bot"] = bot
-        app["config"] = config
-        app["dp"] = dp
-
-        app.on_startup.append(on_startup)
-        app.on_shutdown.append(on_shutdown)
-
-        configure_app(
-            dispatcher=dp,
-            app=app,
-            path="/bot",
-            route_name="bot-webhook"
-        )
+    finally:
+        await dp.storage.close()
+        await dp.storage.wait_closed()
+        await bot.session.close()
 
 
-async def on_startup(app: web.Application):
+async def startup_webhook(app: web.Application):
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    )
+    logger.error("Starting webhook bot")
+
+    # Create database connection pool
+    pool = await create_pool(
+        database_url=config.db.database_url,
+        echo=False,
+    )
+
+    dp.middleware.setup(i18n)
+    dp.middleware.setup(DbMiddleware(pool))
+    dp.middleware.setup(RoleMiddleware(config.tg_bot.admin_id))
+    dp.filters_factory.bind(RoleFilter)
+    dp.filters_factory.bind(AdminFilter)
+
+    register_admin(dp)
+    register_user(dp)
+    register_exam(dp)
+
     while True:
         try:
-            await app["bot"].set_webhook(
-                app["config"].webhook.domain + app["config"].webhook.path
+            await bot.set_webhook(
+                config.webhook.domain + config.webhook.path
             )
 
         except RetryAfter as e:
@@ -118,13 +123,29 @@ async def on_startup(app: web.Application):
             break
 
 
-async def on_shutdown(app: web.Application):
-    await app["dp"].storage.close()
-    await app["dp"].storage.wait_closed()
+async def shutdown_webhook(app: web.Application):
+    await dp.storage.close()
+    await dp.storage.wait_closed()
+    print("BYE")
 
 
 if __name__ == '__main__':
     try:
-        asyncio.run(main())
+        if not config.webhook.domain:
+            asyncio.run(start_polling())
+
+        else:
+            app = web.Application()
+
+            app.on_startup.append(startup_webhook)
+            app.on_shutdown.append(shutdown_webhook)
+
+            configure_app(
+                dispatcher=dp,
+                app=app,
+                path="/bot",
+                route_name="bot-webhook"
+            )
+
     except (KeyboardInterrupt, SystemExit):
         logger.error("Bot stopped!")
