@@ -1,13 +1,7 @@
 aiogram
 aiohttp
-aioredis
-asyncpg
 gunicorn
 lxml
 pyth3
 python-dotenv
-sqlalchemy[asyncio]
 telegraph
-numpy
-pandas
-matplotlib

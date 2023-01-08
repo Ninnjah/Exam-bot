@@ -6,20 +6,21 @@ from aiogram.types import Message, CallbackQuery, InputFile
 from tgbot.cb_data import menu_explorer_cb
 from tgbot.handlers.inline import main_kb, sec_quest_kb
 from tgbot.middlewares.locale import _
-from tgbot.services.repository import Repo
+#from tgbot.services.repository import Repo
 
 ASSETS_PATH = Path("assets")
 
 
-async def user_start(m: Message, repo: Repo):
-    await repo.add_user(
-        m.from_user.id,
-        m.from_user.first_name,
-        m.from_user.last_name,
-        m.from_user.username
-    )
+async def user_start(m: Message):
+    #await repo.add_user(
+    #    m.from_user.id,
+    #    m.from_user.first_name,
+    #    m.from_user.last_name,
+    #    m.from_user.username
+    #)
 
-    asset = await repo.get_asset("main_menu")
+    #asset = await repo.get_asset("main_menu")
+    asset = False
     if asset:
         file_id = asset.file_id
         await m.answer_photo(
@@ -36,7 +37,7 @@ async def user_start(m: Message, repo: Repo):
             caption=_("Экзаменационные билеты какой специальности вам нужны?"),
             reply_markup=main_kb.get_kb()
         )
-        await repo.add_asset("main_menu", message.photo[0].file_id)
+        #await repo.add_asset("main_menu", message.photo[0].file_id)
 
 
 async def return_to_main_menu(callback: CallbackQuery):

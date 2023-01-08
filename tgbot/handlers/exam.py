@@ -18,7 +18,7 @@ from tgbot.handlers.inline import tickets_kb, ticket_confirm_kb, exam_answer_kb,
     exam_result_kb, delete_kb, exam_end_kb
 from tgbot.middlewares.locale import _
 from tgbot.services.number_decl import get_declination
-from tgbot.services.repository import Repo
+#from tgbot.services.repository import Repo
 from tgbot.services.ticket_parser import parse_ticket
 from tgbot.services.telegraph_create import create_page
 
@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 async def ticket_select(
         callback: CallbackQuery,
         callback_data: Dict[str, str],
-        repo: Repo,
         state: FSMContext
 ):
     await state.reset_state()
@@ -46,7 +45,8 @@ async def ticket_select(
         )
 
     except MessageNotModified:
-        asset = await repo.get_asset("main_menu")
+        #asset = await repo.get_asset("main_menu")
+        asset = False
         if asset:
             file_id = asset.file_id
             await callback.message.answer_photo(
@@ -83,7 +83,7 @@ async def ticket_show(callback: CallbackQuery, callback_data: Dict[str, str], st
     )
 
 
-async def ticket_cancel(callback: CallbackQuery, state: FSMContext, repo: Repo):
+async def ticket_cancel(callback: CallbackQuery, state: FSMContext):
     state_data: dict = await state.get_data()
     category: str = state_data.get("category")
     ticket_count: int = state_data.get("ticket_count")
@@ -92,10 +92,9 @@ async def ticket_cancel(callback: CallbackQuery, state: FSMContext, repo: Repo):
         await callback.message.delete()
 
     except MessageCantBeDeleted:
-        asset = await repo.get_asset("main_menu")
-        await callback.message.answer_photo(
-            asset.file_id,
-            caption=_("Выберите билет:"),
+        #asset = await repo.get_asset("main_menu")
+        await callback.message.answer(
+            _("Выберите билет:"),
             reply_markup=tickets_kb.get_kb(category, ticket_count)
         )
 
@@ -235,7 +234,7 @@ async def ticket_answer(callback: CallbackQuery, callback_data: Dict[str, str], 
     await callback.answer()
 
 
-async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
+async def show_tip(callback: CallbackQuery, state: FSMContext):
     # Get ticket data, current question number and score from state storage
     state_data = await state.get_data()
     ticket = state_data.get("ticket")
@@ -266,14 +265,15 @@ async def show_tip(callback: CallbackQuery, state: FSMContext, repo: Repo):
                     await callback.message.reply_document(f, reply_markup=delete_kb.get_kb())
 
             else:
-                await repo.add_page(title, link)
+                #await repo.add_page(title, link)
                 await callback.message.reply(
                     link,
                     reply_markup=delete_kb.get_kb()
                 )
 
     else:
-        asset = await repo.get_asset(tip)
+        #asset = await repo.get_asset(tip)
+        asset = False
         if asset:
             if '.png' in tip:
                 await callback.message.reply_photo(
@@ -314,7 +314,7 @@ async def delete_tip(callback: CallbackQuery):
         pass
 
 
-async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
+async def exam_result(callback: CallbackQuery, state: FSMContext):
     # Get ticket data, current question number and score from state storage
     state_data = await state.get_data()
     ticket = state_data.get("ticket")
@@ -412,6 +412,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
             )
 
     # Save statistic
+    """
     await repo.add_statistic(
         callback.from_user.id,
         ticket_number=ticket_number,
@@ -429,6 +430,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
         callback.from_user.last_name,
         callback.from_user.username
     )
+    """
 
 
 def register_exam(dp: Dispatcher):
