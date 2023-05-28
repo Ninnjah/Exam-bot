@@ -11,8 +11,6 @@ from aiogram.utils.exceptions import RetryAfter
 
 from aiohttp.web_request import Request
 
-from aioredis.connection import ConnectionPool
-
 from dotenv import load_dotenv
 
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -22,9 +20,8 @@ from sqlalchemy.pool import QueuePool
 from tgbot.config import load_config
 from tgbot.database.tables import metadata
 from tgbot.filters.role import RoleFilter, AdminFilter
-from tgbot.handlers.admin import register_admin
-from tgbot.handlers.user import register_user
-from tgbot.handlers.exam import register_exam
+from tgbot.handlers import user, exam
+from tgbot.handlers.admin import admin_users, admin_payments, admin_stats
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
 from tgbot.middlewares.locale import i18n
@@ -37,8 +34,7 @@ if __name__ == "__main__":
 config = load_config()
 
 if config.tg_bot.use_redis:
-    redis = ConnectionPool.from_url(config.redis.url)
-    storage = RedisStorage2(**redis.connection_kwargs)
+    storage = RedisStorage2()
 
 else:
     storage = MemoryStorage()
@@ -96,9 +92,11 @@ async def polling_start():
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
 
-    register_admin(dp)
-    register_user(dp)
-    register_exam(dp)
+    admin_users.register(dp)
+    admin_payments.register(dp)
+    admin_stats.register(dp)
+    user.register(dp)
+    exam.register(dp)
 
     # start
     try:
@@ -126,9 +124,11 @@ async def on_startup(app: web.Application):
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
 
-    register_admin(dp)
-    register_user(dp)
-    register_exam(dp)
+    admin_users.register(dp)
+    admin_payments.register(dp)
+    admin_stats.register(dp)
+    user.register(dp)
+    exam.register(dp)
 
     while True:
         try:

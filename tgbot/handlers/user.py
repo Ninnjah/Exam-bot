@@ -53,7 +53,7 @@ async def control_menu(callback: CallbackQuery):
     )
 
 
-def register_user(dp: Dispatcher):
+def register(dp: Dispatcher):
     dp.register_message_handler(user_start, commands=["start"], state="*")
     dp.register_callback_query_handler(
         return_to_main_menu, menu_explorer_cb.filter(menu="main_menu"), state="*"

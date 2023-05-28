@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 
-from tgbot.database.tables import assets, users, pages, config, user_statistics
+from tgbot.database.tables import assets, users, pages, payments, user_statistics
 
 
 class Repo:
@@ -114,22 +114,24 @@ class Repo:
         except NoResultFound:
             return None
 
-    async def add_config(self, **kwargs):
-        primary_keys = [key.name for key in inspect(config).primary_key]
-
-        stmt = insert(config).values(
-            **kwargs
+    async def add_payment(self, title: str, link: str):
+        stmt = insert(payments).values(
+            title=title,
+            link=link
         ).on_conflict_do_update(
-            index_elements=primary_keys, set_=kwargs
+            index_elements=payments.primary_key,
+            set_={
+                "link": link
+            }
         )
 
         await self.conn.execute(stmt)
         await self.conn.commit()
         return
 
-    async def get_config(self, parameter: str):
-        stmt = select(config).where(
-            config.c.parameter == parameter
+    async def get_config(self, title: str):
+        stmt = select(payments).where(
+            payments.c.title == title
         )
 
         res = await self.conn.execute(stmt)

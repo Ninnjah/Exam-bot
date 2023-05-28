@@ -326,7 +326,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
     start_time: datetime = datetime.fromtimestamp(state_data.get("start_time"))
     time_spent: float = (datetime.now() - start_time).total_seconds()
 
-    donate_link = await repo.get_config("donate_link")
+    payment = await repo.get_config("donate_link")
 
     # Get number of questions (number of correct answers)
     max_score = len(ticket)
@@ -362,7 +362,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 correctness=(current_score / max_score) * 100,
                 time_spent=time_spent_string
             ),
-                reply_markup=exam_end_kb.get_kb(donate_link)
+                reply_markup=exam_end_kb.get_kb(payment.link)
             )
 
         except MessageNotModified:
@@ -377,7 +377,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 correctness=(current_score / max_score) * 100,
                 time_spent=time_spent_string
             ),
-                reply_markup=exam_end_kb.get_kb(donate_link)
+                reply_markup=exam_end_kb.get_kb(payment.link)
             )
 
     else:
@@ -393,7 +393,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 correctness=(current_score / max_score) * 100,
                 time_spent=time_spent_string
             ),
-                reply_markup=exam_end_kb.get_kb(donate_link)
+                reply_markup=exam_end_kb.get_kb(payment.link)
             )
 
         except MessageNotModified:
@@ -408,7 +408,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 correctness=(current_score / max_score) * 100,
                 time_spent=time_spent_string
             ),
-                reply_markup=exam_end_kb.get_kb(donate_link)
+                reply_markup=exam_end_kb.get_kb(payment.link)
             )
 
     # Save statistic
@@ -431,7 +431,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
     )
 
 
-def register_exam(dp: Dispatcher):
+def register(dp: Dispatcher):
     dp.register_callback_query_handler(
         ticket_select, cat_select_cb.filter(), state="*"
     )
