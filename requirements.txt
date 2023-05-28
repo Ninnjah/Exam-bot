@@ -1,12 +1,13 @@
 aiogram
 aiohttp
 aioredis
+redis
 asyncpg
-gunicorn
+uvicorn
 lxml
 pyth3
 python-dotenv
-sqlalchemy[asyncio]
+sqlalchemy
 telegraph
 numpy
 pandas
