@@ -21,7 +21,7 @@ from tgbot.config import load_config
 from tgbot.database.tables import metadata
 from tgbot.filters.role import RoleFilter, AdminFilter
 from tgbot.handlers import user, exam
-from tgbot.handlers.admin import admin_users, admin_payments, admin_stats
+from tgbot.handlers.admin import admin_menu, admin_users, admin_payments, admin_stats
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
 from tgbot.middlewares.locale import i18n
@@ -92,6 +92,7 @@ async def polling_start():
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
 
+    admin_menu.register(dp)
     admin_users.register(dp)
     admin_payments.register(dp)
     admin_stats.register(dp)
@@ -124,6 +125,7 @@ async def on_startup(app: web.Application):
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
 
+    admin_menu.register(dp)
     admin_users.register(dp)
     admin_payments.register(dp)
     admin_stats.register(dp)
