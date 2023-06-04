@@ -393,7 +393,7 @@ async def exam_result(callback: CallbackQuery, repo: Repo, state: FSMContext):
                 correctness=(current_score / max_score) * 100,
                 time_spent=time_spent_string
             ),
-                reply_markup=exam_end_kb.get_kb(payment.link)
+                reply_markup=exam_end_kb.get_kb(payment)
             )
 
         except MessageNotModified:
