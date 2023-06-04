@@ -31,6 +31,10 @@ async def list_users(m: Message, repo: Repo):
             for message in parts.safe_split_text(msg_text, split_separator="\n"):
                 await m.answer(message)
 
+        else:
+            await m.answer(msg_text)
+
+
     else:
         await m.answer(_("Еще никто не пользовался ботом"))
 
