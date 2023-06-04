@@ -34,7 +34,6 @@ async def list_users(m: Message, repo: Repo):
         else:
             await m.answer(msg_text)
 
-
     else:
         await m.answer(_("Еще никто не пользовался ботом"))
 
